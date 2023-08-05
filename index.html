@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<html lang="en" dir="ltr">
+<title>Spicy Handholding</title>
+
+<body>
+    <script src="js/game.js"></script>
+    <script src="js/util.js"></script>
+    <script src="js/monsters.js"></script>
+    <div style="display:inline">
+        <button onclick="saveGame()">SAVE</button>
+        <button onclick="loadGame()">LOAD</button>
+        <button onclick="deleteSave()">DELETE SAVE</button>
+        <br>
+        <button id="newFanButton" disabled onclick="generateFan()">NEW FAN</button>
+        <button id="debutButton" onclick="debutStreamer()">NEW DEBUT</button>
+    </div>
+
+    <div id="stream">
+        <span>STREAMERS</span>
+        <table id="streamlist">
+
+        </table>
+        <span id="currentStreamer"></span>
+        <button class="weekButtons" id="monButton" style="display:none">MON</button>
+        <button class="weekButtons" id="tueButton" style="display:none">TUE</button>
+        <button class="weekButtons" id="wedButton" style="display:none">WED</button>
+        <button class="weekButtons" id="thuButton" style="display:none">THU</button>
+        <button class="weekButtons" id="friButton" style="display:none">FRI</button>
+        <button class="weekButtons" id="satButton" style="display:none">SAT</button>
+        <button class="weekButtons" id="sunButton" style="display:none">SUN</button>
+    </div>
+
+    <div id="studio">
+        <span>STUDIO</span>
+        <div id="funds">
+            Funds: <p id="fundsValue" style="display:contents">10.00</p>
+        </div>
+        <table id="week">
+            <tr style="vertical-align: bottom;height: 20px;text-align: center;">
+                <th width="80px">Monday</th>
+                <th width="80px">Tuesday</th>
+                <th width="80px">Wednesday</th>
+                <th width="80px">Thursday</th>
+                <th width="80px">Friday</th>
+                <th width="80px">Saturday</th>
+                <th width="80px">Sunday</th>
+            </tr>
+            <tr style="vertical-align: top; height: 50px;text-align: center;white-space: pre;">
+                <td id="day0"></td>
+                <td id='day1'></td>
+                <td id="day2"></td>
+                <td id="day3"></td>
+                <td id="day4"></td>
+                <td id='day5'></td>
+                <td id="day6"></td>
+            </tr>
+            
+        </table>
+    </div>
+  
+
+    <div id="fans">
+        <span>FANCLUB</span>
+        <div id='select'>
+            <p style="display:inline-flex">Selected Fan:</p> 
+            <p id="selectData" style="display: inline-flex;white-space:pre">None</p>
+            <div>
+                <button id="fansButton" onclick="shift()" style="display:none;">Fanclub</button>
+                <button id="handButton" onclick="shift()" style="display:none">Handholding</button>
+                <button id="deleteButton" style="display:none">Delete</button>
+            </div>
+        </div>
+
+        
+        <table id="fansTable">
+            <tbody id="fansData">
+            </tbody>
+        </table>
+    </div>
+
+    <div id="hand">
+
+        <span>CHATROOM</span>
+        <table id="handTable">
+            <tbody id='handData'>
+
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        game.start()
+    </script>
+
+</body>
+
+</html>
