@@ -206,7 +206,7 @@ function addFanRow(){
             for (let j=0;j<data.fanLimit;j++){
                 let slot = document.createElement('td')
                 slot.setAttribute('id', 'fr'+(i+1)+'s'+(j+1))
-                slot.setAttribute('style', 'width:150px;border:black solid 1px;height:100px')
+                slot.setAttribute('style', 'width:150px;border:black solid 1px;height:150px')
                 newRow.append(slot)
             }
             table.append(newRow)
@@ -221,11 +221,11 @@ function makeFanEntry(fan, rowNum, slotNum){
     //console.log("fan entry: "+rowNum+','+slotNum)
     let insert = document.getElementById('fr'+rowNum+'s'+slotNum)
 
-    insert.setAttribute('style','white-space:pre;vertical-align:top;border:black solid 1px')
+    insert.setAttribute('style','white-space:pre;vertical-align:top;border:black solid 1px;text-align:center')
     insert.setAttribute('onclick','select('+fan.id+')')
     insert.setAttribute('width','150px')
-    insert.setAttribute('height','100px')
-    insert.innerHTML = "Type: "+fan.name+"\nLove: "+fan.love.toFixed(2)+"\nLoyalty: "+fan.loyalty.toFixed(2)+"\nBudget: "+fan.money.toFixed(2)+"\n"
+    insert.setAttribute('height','150px')
+    insert.innerHTML = "Type: "+fan.name+"\nLove: "+fan.love.toFixed(2)+"\nLoyalty: "+fan.loyalty.toFixed(2)+"\nBudget: "+fan.money.toFixed(2)+"\nOshis: "+fan.oshi.length+"\n"
 }
 
 function printAllFans(){
@@ -297,7 +297,7 @@ function select(n){
     if (location !== undefined){
         let fan = data.currentFans[location[0]][location[1]]
         console.log(fan)
-        document.getElementById('selectData').innerHTML = ("Type: "+fan.name+"\nLove: "+fan.love.toFixed(2)+"\nLoyalty: "+fan.loyalty.toFixed(2)+"\nBudget: "+fan.money.toFixed(2))
+        document.getElementById('selectData').innerHTML = ("Type: "+fan.name+"\nLove: "+fan.love.toFixed(2)+"\nLoyalty: "+fan.loyalty.toFixed(2)+"\nBudget: "+fan.money.toFixed(2)+"\nOshis: "+fan.oshi.length+'\n')
         let fullRows = checkFull(data.handHolding)
         if (fullRows < data.handSlots){  
             document.getElementById('handButton').innerHTML = "Handholding"
@@ -314,7 +314,7 @@ function select(n){
         let location = searchID(data.handHolding, n)
         let fan = data.handHolding[location[0]][location[1]]
         console.log(fan)
-        document.getElementById('selectData').innerHTML = ("Type: "+fan.name+"\nLove: "+fan.love.toFixed(2)+"\nLoyalty: "+fan.loyalty.toFixed(2)+"\nBudget: "+fan.money.toFixed(2))
+        document.getElementById('selectData').innerHTML = ("Type: "+fan.name+"\nLove: "+fan.love.toFixed(2)+"\nLoyalty: "+fan.loyalty.toFixed(2)+"\nBudget: "+fan.money.toFixed(2)+"\nOshis: "+fan.oshi.length+'\n')
         let fullRows = checkFull(data.currentFans)
         if (fullRows < data.fanSlots){
             document.getElementById('fansButton').setAttribute('onclick','shift('+n+')')
@@ -394,13 +394,13 @@ function makeHandholdEntry(fan, rowNum, slotNum){
     //console.log('hand entry: '+rowNum+','+slotNum)
     let insert = document.getElementById('hr'+rowNum+'s'+slotNum)
 
-    insert.setAttribute('style','white-space:pre;vertical-align:top;border: black solid 1px')
+    insert.setAttribute('style','white-space:pre;vertical-align:top;border: black solid 1px;text-align:center')
     if (fan.inProgress != true){
         insert.setAttribute('onclick','select('+fan.id+')')
     }
     insert.setAttribute('width','150px')
-    insert.setAttribute('height','100px')
-    insert.innerHTML = "Type: "+fan.name+"\nLove: "+fan.love.toFixed(2)+"\nLoyalty: "+fan.loyalty.toFixed(2)+"\nBudget: "+fan.money.toFixed(2)+"\n"
+    insert.setAttribute('height','150px')
+    insert.innerHTML = "Type: "+fan.name+"\nLove: "+fan.love.toFixed(2)+"\nLoyalty: "+fan.loyalty.toFixed(2)+"\nBudget: "+fan.money.toFixed(2)+"\nOshis: "+fan.oshi.length+'\n'
 }
 
 function printAllHandholding(){
@@ -457,11 +457,11 @@ function addHandholdRow(){
 
             let slot1 = document.createElement('td')
             slot1.setAttribute('id', 'hr'+(i+1)+'s1')
-            slot1.setAttribute('style','width:150px;border:black solid 1px;height:100px')
+            slot1.setAttribute('style','width:150px;border:black solid 1px;height:150px')
             
             let slot2 = document.createElement('td')
             slot2.setAttribute('id', 'hr'+(i+1)+'s2')
-            slot2.setAttribute('style','width:150px;border:black solid 1px;height:100px')
+            slot2.setAttribute('style','width:150px;border:black solid 1px;height:150px')
 
             let buttonslot = document.createElement('td')
             buttonslot.setAttribute('id', 'hr'+(i+1)+'b')
@@ -609,9 +609,9 @@ function offspring(rowNum, id1, id2){
 
         if (newbie.name.length > 10){
             let shortName = newbie.name.slice(0,8)
-            var addText = document.createTextNode("Type: "+shortName+"...\nLove: "+newbie.love.toFixed(2)+"\nLoyalty: "+newbie.loyalty.toFixed(2)+"\nBudget: "+newbie.money.toFixed(2)+"\n")
+            var addText = document.createTextNode("Type: "+shortName+"...\nLove: "+newbie.love.toFixed(2)+"\nLoyalty: "+newbie.loyalty.toFixed(2)+"\nBudget: "+newbie.money.toFixed(2)+"\nOshis: "+newbie.oshi.length+'\n')
         } else {
-            var addText = document.createTextNode("Type: "+newbie.name+"\nLove: "+newbie.love.toFixed(2)+"\nLoyalty: "+newbie.loyalty.toFixed(2)+"\nBudget: "+newbie.money.toFixed(2)+"\n")
+            var addText = document.createTextNode("Type: "+newbie.name+"\nLove: "+newbie.love.toFixed(2)+"\nLoyalty: "+newbie.loyalty.toFixed(2)+"\nBudget: "+newbie.money.toFixed(2)+"\nOshis: "+newbie.oshi.length+'\n')
         }
         console.log(id1)
         deleteFan(id1, data.handHolding)
