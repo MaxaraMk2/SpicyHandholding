@@ -106,7 +106,7 @@ game = {
         printAllFans()
         printAllHandholding()
         checkForButton()
-
+        organiseFans()
 
         for  (let i=0;i<data.debutList.length;i++){
             addStreamer(data.debutList[i])
@@ -218,7 +218,7 @@ function addFanRow(){
 }
 
 function makeFanEntry(fan, rowNum, slotNum){
-    console.log("fan entry: "+rowNum+','+slotNum)
+    //console.log("fan entry: "+rowNum+','+slotNum)
     let insert = document.getElementById('fr'+rowNum+'s'+slotNum)
 
     insert.setAttribute('style','white-space:pre;vertical-align:top;border:black solid 1px')
@@ -229,6 +229,7 @@ function makeFanEntry(fan, rowNum, slotNum){
 }
 
 function printAllFans(){
+    game.update()
     document.getElementById('fansData').innerHTML == ""
     if (data.currentFans[0].length > 0){
         for (let i=0; i<data.fanSlots;i++){
@@ -241,6 +242,27 @@ function printAllFans(){
                     makeFanEntry(fan, i+1, j+1)
                 }
             }   
+        }
+    }
+}
+
+function organiseFans(){
+    for (let i=0;i<data.currentFans.length-1;i++){
+        if (data.currentFans[i].length == 0 || data.currentFans[i].length == data.fanLimit){
+            continue
+        }
+        if (data.currentFans[i].length < data.fanLimit
+            && (i+1)<data.currentFans.length
+            && data.currentFans[i+1].length > 0){
+            let startLength = data.currentFans[i+1].length
+            for (let j=0;j<startLength;j++){
+                if (data.currentFans[i].length < data.fanLimit){
+                    data.currentFans[i].push(data.currentFans[i+1][j])
+                    data.currentFans[i+1].splice(0,1)
+                } else {
+                    break
+                }
+            }
         }
     }
 }
@@ -347,19 +369,21 @@ function shift(n){
                 continue
             } else {
                 let slot = data.currentFans[i].length
-                if (slot<8){
+                if (slot<data.fanLimit){
                     console.log('slot: '+(slot+1))
                     data.currentFans[i].push(data.handHolding[location[0]][location[1]])
                     deleteFan(n, data.handHolding)
+                    break
                 }
             }
         }  
     }
-    printAllHandholding()
-    printAllFans()
+    game.onLoad()
 }
 
 function deleteFan(n, list){
+    //console.log(list)
+    //console.log(n)
     let index = searchID(list, n)
     list[index[0]].splice(index[1],1)
     clearSelect()
@@ -367,7 +391,7 @@ function deleteFan(n, list){
 }
 
 function makeHandholdEntry(fan, rowNum, slotNum){
-    console.log('hand entry: '+rowNum+','+slotNum)
+    //console.log('hand entry: '+rowNum+','+slotNum)
     let insert = document.getElementById('hr'+rowNum+'s'+slotNum)
 
     insert.setAttribute('style','white-space:pre;vertical-align:top;border: black solid 1px')
@@ -404,7 +428,8 @@ function checkForButton(){
             newButton.setAttribute('id', 'button'+(i+1))
             newButton.setAttribute('onclick','holdHands('+[(i+1), data.handHolding[i][0].id, data.handHolding[i][1].id]+')')
             newButton.setAttribute('style', 'white-space:pre')
-            if (data.currentFans.length == data.fanSlots && data.currentFans.slice(-1)[0].length == data.fanLimit) { 
+            let fullRows = checkFull(data.currentFans)
+            if (fullRows == data.fanSlots) { 
                 newButton.setAttribute('disabled', true)
                 newButton.innerHTML = "No room\nin Fanclub!"
             } else if (data.handHolding[i][0].oshi.length == data.handHolding[i][1].oshi.length){
@@ -678,3 +703,15 @@ function updateBar(timestamp){
     window.requestAnimationFrame(updateBar)
 }
 
+function upgrade(item){
+    switch (item){
+        case "fanSlots":
+            data.fanSlots++
+            game.onLoad()
+            break
+        case 'handSlots':
+            data.handSlots++
+            game.onLoad()
+            break
+    }
+}
