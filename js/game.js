@@ -225,7 +225,12 @@ function makeFanEntry(fan, rowNum, slotNum){
     insert.setAttribute('onclick','select('+fan.id+')')
     insert.setAttribute('width','150px')
     insert.setAttribute('height','150px')
-    insert.innerHTML = "Type: "+fan.name+"\nLove: "+fan.love.toFixed(2)+"\nLoyalty: "+fan.loyalty.toFixed(2)+"\nBudget: "+fan.money.toFixed(2)+"\nOshis: "+fan.oshi.length+"\n"
+    let printName = fan.name
+    if (printName.length > 10){
+        printName = printName.slice(0,8)
+        printName = printName+'...'
+    }
+    insert.innerHTML = "Type: "+printName+"\nLove: "+fan.love.toFixed(2)+"\nLoyalty: "+fan.loyalty.toFixed(2)+"\nBudget: "+fan.money.toFixed(2)+"\nOshis: "+fan.oshi.length+"\n"
 }
 
 function printAllFans(){
@@ -400,7 +405,12 @@ function makeHandholdEntry(fan, rowNum, slotNum){
     }
     insert.setAttribute('width','150px')
     insert.setAttribute('height','150px')
-    insert.innerHTML = "Type: "+fan.name+"\nLove: "+fan.love.toFixed(2)+"\nLoyalty: "+fan.loyalty.toFixed(2)+"\nBudget: "+fan.money.toFixed(2)+"\nOshis: "+fan.oshi.length+'\n'
+    let printName = fan.name
+    if (printName.length > 10){
+        printName = printName.slice(0,8)
+        printName = printName+'...'
+    }
+    insert.innerHTML = "Type: "+printName+"\nLove: "+fan.love.toFixed(2)+"\nLoyalty: "+fan.loyalty.toFixed(2)+"\nBudget: "+fan.money.toFixed(2)+"\nOshis: "+fan.oshi.length+'\n'
 }
 
 function printAllHandholding(){
@@ -607,12 +617,6 @@ function offspring(rowNum, id1, id2){
             }
         }  
 
-        if (newbie.name.length > 10){
-            let shortName = newbie.name.slice(0,8)
-            var addText = document.createTextNode("Type: "+shortName+"...\nLove: "+newbie.love.toFixed(2)+"\nLoyalty: "+newbie.loyalty.toFixed(2)+"\nBudget: "+newbie.money.toFixed(2)+"\nOshis: "+newbie.oshi.length+'\n')
-        } else {
-            var addText = document.createTextNode("Type: "+newbie.name+"\nLove: "+newbie.love.toFixed(2)+"\nLoyalty: "+newbie.loyalty.toFixed(2)+"\nBudget: "+newbie.money.toFixed(2)+"\nOshis: "+newbie.oshi.length+'\n')
-        }
         console.log(id1)
         deleteFan(id1, data.handHolding)
         deleteFan(id2, data.handHolding)
