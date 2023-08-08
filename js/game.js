@@ -26,11 +26,16 @@ data = {
     barProgress: [],
     offspring: [],
     debutList: [],
-    streamSchedule: ["-","-","-","-","-","-","-"],
+    streamSchedule: [['-','-','-','-','-','-','-']],
     currentDay: 0,
     handSlots: 1,
     fanSlots:1,
     fanLimit: 6,
+    studioSlots: 1,
+}
+
+temp = {
+    updateName: ''
 }
 
 game = {
@@ -38,25 +43,13 @@ game = {
         gameInterval = window.setInterval(game.tick,1000)
         window.requestAnimationFrame(updateBar)       
         document.getElementById('newFanButton').setAttribute('disabled',true)
-        for (let i=0;i<7;i++){
-            document.getElementById('day'+i).innerHTML = data.streamSchedule[i]
-        }
         addHandholdRow()
         addFanRow()
+        addStudioRow()
+        printSchedule()
     },
     tick: function(){
-        let span = document.createElement('span')
-        if (data.streamSchedule[data.currentDay] != "-"){
-            span.innerHTML = "\nLIVE"
-            span.setAttribute('style','color:red')
-            document.getElementById('day'+data.currentDay).append(span)
-            setTimeout((id, toRemove) => {try{document.getElementById(id).removeChild(toRemove)} catch {}}, 800, 'day'+data.currentDay, span)
-        } else {
-            span.innerHTML = "\nOFFLINE"
-            document.getElementById('day'+data.currentDay).append(span)
-            setTimeout((id, toRemove) => {try {document.getElementById(id).removeChild(toRemove)} catch {}}, 800, 'day'+data.currentDay, span)
-
-        }
+        liveMarker()
         for (let i=0;i<data.currentFans.length;i++){
             for (let j=0;j<data.currentFans[i].length;j++){
                 if (typeof data.currentFans[i][j] == 'object'){
@@ -92,6 +85,7 @@ game = {
         if (data.handHolding.length < data.handSlots){
             data.handHolding.push([])
         }
+        
     },
     onLoad: function(){
         //resetTables()
@@ -103,16 +97,109 @@ game = {
         
         addFanRow()
         addHandholdRow()
+        addStudioRow()
         printAllFans()
         printAllHandholding()
+        printSchedule()
         checkForButton()
         organiseFans()
+        assign(temp.updateName)
 
         for  (let i=0;i<data.debutList.length;i++){
             addStreamer(data.debutList[i])
         }
 
         game.update()
+    }
+}
+
+function liveMarker(){
+    let span = document.createElement('span')
+    for (let i=0;i<data.studioSlots;i++){
+        if (data.streamSchedule[i][data.currentDay] != "-"){      
+            let span = document.createElement('span')    
+            span.innerHTML = "\nLIVE"
+            span.setAttribute('style','color:red')
+            document.getElementById('s'+(i+1)+'d'+(data.currentDay+1)).append(span)
+            setTimeout((id, toRemove) => {try{document.getElementById(id).removeChild(toRemove)} catch {}}, 800, 's'+(i+1)+'d'+(data.currentDay+1), span)
+        } else {
+            let span = document.createElement('span')
+            span.innerHTML = "\nOFFLINE"
+            document.getElementById('s'+(i+1)+'d'+(data.currentDay+1)).append(span)
+            setTimeout((id, toRemove) => {try {document.getElementById(id).removeChild(toRemove)} catch {}}, 800, 's'+(i+1)+'d'+(data.currentDay+1), span)
+
+        }
+    }
+}
+
+function addStudioRow(){
+    for (let i=0;i<data.studioSlots;i++){
+        if(document.getElementById('studio'+(i+1)) === null){
+            let table = document.getElementById('week')
+            let newRow = document.createElement('tr')
+            newRow.setAttribute('id', 'studio'+(i+1))
+
+            for (let j=0;j<7;j++){
+                let slot = document.createElement('td')
+                slot.setAttribute('id', 's'+(i+1)+'d'+(j+1))
+                slot.setAttribute('style', "vertical-align: top; height: 50px;text-align: center;white-space: pre;")
+                newRow.append(slot)
+            }
+            table.append(newRow)
+
+        } else {
+            //console.log('already max fan rows')
+        }
+
+        if (document.getElementById('sButton'+(i+1)) === null){
+            let table = document.getElementById('scheduleButtons')
+            let newRow = document.createElement('tr')
+            newRow.setAttribute('id', 'sButton'+(i+1))
+
+            for (let j=0;j<7;j++){
+                let slot = document.createElement('button')
+                slot.setAttribute('id', 's'+(i+1)+'b'+(j+1))
+                slot.setAttribute('style', 'display:none')
+                let dayName = ''
+                switch (j){
+                    case 0:
+                        dayName = 'MON'
+                        break
+                    case 1:
+                        dayName = "TUE"
+                        break
+                    case 2:
+                        dayName = "WED"
+                        break
+                    case 3:
+                        dayName = "THU"
+                        break
+                    case 4:
+                        dayName = "FRI"
+                        break
+                    case 5:
+                        dayName = "SAT"
+                        break
+                    case 6:
+                        dayName = "SUN"
+                        break
+                    default:
+                        console.log('uh oh')
+                        break
+                }
+                slot.innerHTML = dayName
+                newRow.append(slot)
+            }
+            table.append(newRow)
+        }
+    }
+}
+
+function printSchedule(){
+    for (let i=0;i<data.studioSlots;i++){
+        for (let j=0;j<7;j++){
+            document.getElementById('s'+(i+1)+'d'+(j+1)).innerHTML = data.streamSchedule[i][j]
+        }
     }
 }
 
@@ -140,6 +227,59 @@ function addStreamer(name){
             newStream.setAttribute('width','50px')
             newStream.setAttribute('height','20px')
             document.getElementById('streamlist').append(newStream)
+}
+
+function assign(name){
+    if (name == ""){
+        return
+    }
+    temp.updateName = name
+    
+    //make all buttons appear
+    for (let i=0;i<data.studioSlots;i++){
+        for (let j=0;j<7;j++){
+            let button = document.getElementById('s'+(i+1)+'b'+(j+1))
+            button.setAttribute('style','display:inline-flex')
+            button.setAttribute('onclick','addToSchedule("'+name+'",'+i+','+j+')')
+            if (data.streamSchedule[i][j] == name){
+                button.setAttribute('disabled', true)
+            } else {
+                button.removeAttribute('disabled')
+            }
+        }
+        document.getElementById('currentStreamer').innerHTML = 'Assigning for '+name+": "
+
+        if(document.getElementById('sLabel'+(i+1)) === null){
+            let label = document.createElement('span')
+            label.id = 'sLabel'+(i+1)
+            label.innerHTML = 'Studio '+(i+1)+': '
+            document.getElementById('sButton'+(i+1)).prepend(label)
+        }
+
+    }
+
+    //disable taken days
+}
+
+function addToSchedule(name, studio, dayNum){
+    let check = checkDays(dayNum, name)
+    if (check == -1){
+        data.streamSchedule[studio][dayNum] = name
+    } else if (check >= 0){
+        data.streamSchedule[check][dayNum] = '-'
+        document.getElementById('s'+(check+1)+'b'+(dayNum+1)).removeAttribute('disabled')
+        data.streamSchedule[studio][dayNum] = name
+    }
+    
+    let button = document.getElementById('s'+(studio+1)+'b'+(dayNum+1))
+    button.setAttribute('disabled','true')
+
+    if (data.streamSchedule[studio][dayNum] != name){
+        button.removeAttribute('disabled')
+    }
+
+    document.getElementById('s'+(studio+1)+'d'+(dayNum+1)).innerHTML = name
+    printSchedule()
 }
 
 function generateFan(){
@@ -272,30 +412,7 @@ function organiseFans(){
     }
 }
 
-function assign(name){
-    console.log(name)
-    let week = document.getElementsByClassName('weekButtons')
-    for (let i=0;i<7;i++){
-        week[i].setAttribute('style','display:inline-flex')
-        if (data.streamSchedule[i] == name){
-            week[i].setAttribute('disabled','true')
-        } else {
-            week[i].removeAttribute('disabled')
-        }
-        week[i].setAttribute('onclick','addToSchedule("'+name+'",'+i+')')
-    }
-    document.getElementById('currentStreamer').innerHTML = 'Assigning for '+name+": "
-}
 
-function addToSchedule(name, dayNum){
-    data.streamSchedule[dayNum] = name
-    let week = document.getElementsByClassName('weekButtons')
-    week[dayNum].setAttribute('disabled','true')
-    if (data.streamSchedule[dayNum] != name){
-        week[dayNum].removeAttribute('disabled')
-    }
-    document.getElementById("day"+dayNum).innerHTML = name
-}
 
 function select(n){
     let location = searchID(data.currentFans, n)
@@ -711,11 +828,15 @@ function upgrade(item){
     switch (item){
         case "fanSlots":
             data.fanSlots++
-            game.onLoad()
             break
         case 'handSlots':
             data.handSlots++
-            game.onLoad()
+            break
+        case 'studioSlots':
+            data.studioSlots++
+            data.streamSchedule.push(['-','-','-','-','-','-','-'])
+            
             break
     }
+    game.onLoad()
 }

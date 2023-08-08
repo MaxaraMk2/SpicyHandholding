@@ -137,3 +137,20 @@ function checkFull(list){
     }
     return fullRows
 }
+
+function checkDays(dayNum, name){
+    let isScheduled = -1
+    for (let i=0;i<data.studioSlots;i++){
+        if (data.streamSchedule[i][dayNum]==name){
+            isScheduled = i
+        }
+    }
+    //console.log(isScheduled)
+    return isScheduled
+}
+
+function disableDays(dayNum, name){
+    for (let i=0;i<data.studioSlots;i++){
+                document.getElementById('s'+(i+1)+'b'+(dayNum+1)).setAttribute('disabled', true)
+    }
+}

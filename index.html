@@ -22,13 +22,12 @@
 
         </table>
         <span id="currentStreamer"></span>
-        <button class="weekButtons" id="monButton" style="display:none">MON</button>
-        <button class="weekButtons" id="tueButton" style="display:none">TUE</button>
-        <button class="weekButtons" id="wedButton" style="display:none">WED</button>
-        <button class="weekButtons" id="thuButton" style="display:none">THU</button>
-        <button class="weekButtons" id="friButton" style="display:none">FRI</button>
-        <button class="weekButtons" id="satButton" style="display:none">SAT</button>
-        <button class="weekButtons" id="sunButton" style="display:none">SUN</button>
+
+        <table id="scheduleButtons">
+            
+        </table>
+
+        </div>
     </div>
 
     <div id="studio">
@@ -45,15 +44,6 @@
                 <th width="80px">Friday</th>
                 <th width="80px">Saturday</th>
                 <th width="80px">Sunday</th>
-            </tr>
-            <tr style="vertical-align: top; height: 50px;text-align: center;white-space: pre;">
-                <td id="day0"></td>
-                <td id='day1'></td>
-                <td id="day2"></td>
-                <td id="day3"></td>
-                <td id="day4"></td>
-                <td id='day5'></td>
-                <td id="day6"></td>
             </tr>
             
         </table>
@@ -98,6 +88,9 @@
                 </td>
                 <td>
                     <button onclick="upgrade('handSlots')">Upgrade Chatroom</button>
+                </td>
+                <td>
+                    <button onclick="upgrade('studioSlots')">Upgrade Studio</button>
                 </td>
             </tbody>
         </table>
