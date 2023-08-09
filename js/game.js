@@ -18,6 +18,7 @@ data = {
     maxLoyalty: 20,
     maxMoney: 50,
     funds: 10,
+    numFans: 0,
     totalFans:0,
     totalButtons:0,
     allFans: [],
@@ -32,6 +33,8 @@ data = {
     fanSlots:1,
     fanLimit: 6,
     studioSlots: 1,
+    costOfStreamer: 0,
+    costOfFan: 2,
 }
 
 temp = {
@@ -85,7 +88,10 @@ game = {
         if (data.handHolding.length < data.handSlots){
             data.handHolding.push([])
         }
-        
+        if (data.numFans > 0){
+            data.costOfFan = 2**data.numFans
+        }
+        document.getElementById('newFanButton').innerHTML = "NEW FAN ($"+data.costOfFan.toFixed(2)+")"
     },
     onLoad: function(){
         //resetTables()
@@ -204,16 +210,26 @@ function printSchedule(){
 }
 
 function debutStreamer(){
-    let index = randIntRange(0, data.oshiName.length-1)
-    if (data.debutList.length < data.oshiName.length){
-        if (!data.debutList.includes(data.oshiName[index])){
-            data.debutList.push(data.oshiName[index])
-            addStreamer(data.oshiName[index])
+    if (data.funds >= data.costOfStreamer){
+        let index = randIntRange(0, data.oshiName.length-1)
+        if (data.debutList.length < data.oshiName.length){
+            if (!data.debutList.includes(data.oshiName[index])){
+                data.debutList.push(data.oshiName[index])
+                addStreamer(data.oshiName[index])
+            } else {
+                debutStreamer()
+            }
         } else {
-            debutStreamer()
+            document.getElementById('debutButton').setAttribute('disabled','true')
         }
-    } else {
-        document.getElementById('debutButton').setAttribute('disabled','true')
+        data.funds -= data.costOfStreamer
+        game.update()
+        if (data.costOfStreamer == 0){
+            data.costOfStreamer = 1000
+        } else {
+            data.costOfStreamer *= 2
+        }
+        document.getElementById('debutButton').innerHTML = 'NEW DEBUT ($'+data.costOfStreamer+')'
     }
 }
 
@@ -283,35 +299,39 @@ function addToSchedule(name, studio, dayNum){
 }
 
 function generateFan(){
-    let oshiNum = randIntRange(0, data.debutList.length-1)
-    let name = data.fanName[data.oshiName.indexOf(data.debutList[oshiNum])]
-    let love = randIntRange(1,data.maxLove)
-    let loyalty = randIntRange(1,data.maxLoyalty)
-    let money = randIntRange (1,data.maxMoney)
-    let oshi =  [data.oshiName[data.oshiName.indexOf(data.debutList[oshiNum])]]
-    let newbie = new Fan(name,love,loyalty,money, oshi)
+    if (data.funds >= data.costOfFan){
+        data.numFans++
+        let oshiNum = randIntRange(0, data.debutList.length-1)
+        let name = data.fanName[data.oshiName.indexOf(data.debutList[oshiNum])]
+        let love = randIntRange(1,data.maxLove)
+        let loyalty = randIntRange(1,data.maxLoyalty)
+        let money = randIntRange (1,data.maxMoney)
+        let oshi =  [data.oshiName[data.oshiName.indexOf(data.debutList[oshiNum])]]
+        let newbie = new Fan(name,love,loyalty,money, oshi)
 
-    let startLength  = data.currentFans.length
-    if (startLength < data.fanSlots){
-        data.currentFans.push([])
-    }
-    for (let i=0;i<startLength;i++){
-        if (data.currentFans[i].length == data.fanLimit){
-            continue
-        } else {
-            let slot = data.currentFans[i].length
-            if (slot<data.fanLimit){
-                console.log('slot: '+(slot+1))
-                data.currentFans[i].push(newbie)
-                data.allFans.push(newbie)
-                data.totalFans++
-                break
-            } else {
-                console.log('max fans')
-            }
+        let startLength  = data.currentFans.length
+        if (startLength < data.fanSlots){
+            data.currentFans.push([])
         }
-    }  
-    game.onLoad()
+        for (let i=0;i<startLength;i++){
+            if (data.currentFans[i].length == data.fanLimit){
+                continue
+            } else {
+                let slot = data.currentFans[i].length
+                if (slot<data.fanLimit){
+                    console.log('slot: '+(slot+1))
+                    data.currentFans[i].push(newbie)
+                    data.allFans.push(newbie)
+                    data.totalFans++
+                    break
+                } else {
+                    console.log('max fans')
+                }
+            }
+        }  
+        data.funds -= data.costOfFan
+        game.onLoad()
+    }
 }
 
 function resetTables(){
@@ -429,7 +449,7 @@ function select(n){
             document.getElementById('handButton').setAttribute('disabled',true)
             document.getElementById('handButton').innerHTML = "Chatroom Full!"
         }
-        document.getElementById('deleteButton').setAttribute('onclick','deleteFan('+n+', data.currentFans)')
+        document.getElementById('deleteButton').setAttribute('onclick','deleteFan('+n+', data.currentFans, true)')
         disappear(['fansButton'])
         appear(['handButton','deleteButton'])
     } else{
@@ -446,7 +466,7 @@ function select(n){
             document.getElementById('fansButton').setAttribute('disabled',true)
             document.getElementById('fansButton').innerHTML = "Fanclub Full!"
         }
-        document.getElementById('deleteButton').setAttribute('onclick','deleteFan('+n+', data.handHolding)')
+        document.getElementById('deleteButton').setAttribute('onclick','deleteFan('+n+', data.handHolding, true)')
         disappear(['handButton'])
         appear(['fansButton','deleteButton'])
     }
@@ -503,7 +523,10 @@ function shift(n){
     game.onLoad()
 }
 
-function deleteFan(n, list){
+function deleteFan(n, list, buttonPressed = false){
+    if (buttonPressed){
+        data.numFans--
+    }
     //console.log(list)
     //console.log(n)
     let index = searchID(list, n)
@@ -736,6 +759,7 @@ function offspring(rowNum, id1, id2){
         }  
 
         console.log(id1)
+        data.numFans--
         deleteFan(id1, data.handHolding)
         deleteFan(id2, data.handHolding)
         data.barProgress[rowNum-1] = null
