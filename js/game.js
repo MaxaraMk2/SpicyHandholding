@@ -638,6 +638,7 @@ async function holding(id1, id2){
     parent2.inProgress = true
 
     let newLove = (parent1.love + parent2.love) / (1+(randIntRange(30,70)/100))
+    let loveExcess = 0
     if (parent1.love + parent2.love == data.maxLove*2){
         if (data.maxLove <= 95){
             data.maxLove += 5
@@ -792,7 +793,7 @@ function incrementBar(rowNum, oshiNum, id1, id2){
     }
 }
 
-function updateBar(timestamp){
+function updateBar(){
     for (let i=0;i<data.inProgress.length;i++){
         if (data.inProgress[i] == true){
             if (document.getElementById('barProgress'+(i+1)) !== null && document.getElementById('barProgress'+(i+1)) !== undefined){
@@ -833,9 +834,13 @@ function upgrade(item){
             data.handSlots++
             break
         case 'studioSlots':
-            data.studioSlots++
-            data.streamSchedule.push(['-','-','-','-','-','-','-'])
-            
+            if (data.studioSlots < data.oshiName.length){
+                data.studioSlots++
+                data.streamSchedule.push(['-','-','-','-','-','-','-']) 
+            }         
+            break
+        default:
+            console.log('upgrade error oh no')
             break
     }
     game.onLoad()
