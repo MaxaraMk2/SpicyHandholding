@@ -35,6 +35,9 @@ data = {
     studioSlots: 1,
     costOfStreamer: 0,
     costOfFan: 2,
+    costOfFanclub: 500,
+    costOfChatroom: 250,
+    costOfStudio: 10000,
 }
 
 temp = {
@@ -45,11 +48,12 @@ game = {
     start: function(){
         gameInterval = window.setInterval(game.tick,1000)
         window.requestAnimationFrame(updateBar)       
-        document.getElementById('newFanButton').setAttribute('disabled',true)
+        document.getElementById('newFanButton').setAttribute('disabled', true)
         addHandholdRow()
         addFanRow()
         addStudioRow()
         printSchedule()
+        game.tick()
     },
     tick: function(){
         liveMarker()
@@ -61,6 +65,8 @@ game = {
             }
         }
         
+        checkPurchasables()
+
         for (let i=0; i< data.barProgress.length;i++){
             let fullRows = checkFull(data.currentFans)
             if (data.inProgress[i] === true && (data.barProgress[i] !== null || undefined )&& fullRows<data.fanSlots){
@@ -100,7 +106,7 @@ game = {
         document.getElementById('handData').innerHTML = ""
         //console.log(data.currentFans)
         //console.log('loading..')
-        
+
         addFanRow()
         addHandholdRow()
         addStudioRow()
@@ -109,6 +115,8 @@ game = {
         printSchedule()
         checkForButton()
         organiseFans()
+        checkPurchasables()
+
         assign(temp.updateName)
 
         for  (let i=0;i<data.debutList.length;i++){
@@ -116,6 +124,61 @@ game = {
         }
 
         game.update()
+    }
+}
+
+function setInitialCost(){
+    // update buttons in beginning
+}
+
+var purchaseButtons = ['newFanButton', 'debutButton', 'upgradeFanclubButton', 'upgradeChatroomButton', 'upgradeStudioButton']
+function checkPurchasables(){
+    // enable/disable buttons based on funds
+    for (let i=0;i<purchaseButtons.length;i++){
+        button = document.getElementById(purchaseButtons[i])
+
+        switch (i){
+            case 0:
+                if (data.funds >= data.costOfFan && data.debutList.length > 0){
+                    //console.log('checkPurchasables')
+                    button.removeAttribute('disabled')
+                    disableBuyIfFanclubFull()
+                } else {
+                    button.setAttribute('disabled', true)
+                }
+                break
+            case 1:
+                if (data.funds >= data.costOfStreamer && data.debutList.length < data.oshiName.length) {
+                    button.removeAttribute('disabled')
+                }else {
+                    button.setAttribute('disabled', true)
+                }
+                break
+            case 2:
+                if (data.funds >= data.costOfFanclub) {
+                    button.removeAttribute('disabled')
+                }else {
+                    button.setAttribute('disabled', true)
+                }
+                break
+            case 3:
+                if (data.funds >= data.costOfChatroom) {
+                    button.removeAttribute('disabled')
+                }else {
+                    button.setAttribute('disabled', true)
+                }
+                break
+            case 4:
+                if (data.funds >= data.costOfStudio) {
+                    button.removeAttribute('disabled')
+                }else {
+                    button.setAttribute('disabled', true)
+                }
+                break
+            default:
+                console.log('checkPurchasable error oh no')
+                break
+        }
     }
 }
 
@@ -231,10 +294,13 @@ function debutStreamer(){
         }
         document.getElementById('debutButton').innerHTML = 'NEW DEBUT ($'+data.costOfStreamer+')'
     }
+    checkPurchasables()
 }
 
 function addStreamer(name){
-    document.getElementById('newFanButton').removeAttribute('disabled')
+    if (data.funds >= data.costOfFan){
+        document.getElementById('newFanButton').removeAttribute('disabled')
+    }
     let newStream = document.createElement('td')
             newStream.innerHTML = name
             newStream.setAttribute('id', name)
@@ -274,7 +340,6 @@ function assign(name){
 
     }
 
-    //disable taken days
 }
 
 function addToSchedule(name, studio, dayNum){
@@ -303,9 +368,9 @@ function generateFan(){
         data.numFans++
         let oshiNum = randIntRange(0, data.debutList.length-1)
         let name = data.fanName[data.oshiName.indexOf(data.debutList[oshiNum])]
-        let love = randIntRange(1,data.maxLove)
-        let loyalty = randIntRange(1,data.maxLoyalty)
-        let money = randIntRange (1,data.maxMoney)
+        let love = randIntRange(1,10)
+        let loyalty = randIntRange(1,10)
+        let money = randIntRange (1,25)
         let oshi =  [data.oshiName[data.oshiName.indexOf(data.debutList[oshiNum])]]
         let newbie = new Fan(name,love,loyalty,money, oshi)
 
@@ -331,6 +396,19 @@ function generateFan(){
         }  
         data.funds -= data.costOfFan
         game.onLoad()
+    }
+    checkPurchasables()
+    disableBuyIfFanclubFull()
+}
+
+function disableBuyIfFanclubFull(){
+    let fullRows = checkFull(data.currentFans)
+
+    if (fullRows == data.fanSlots){
+        document.getElementById('newFanButton').setAttribute('disabled',true)
+    } else if (data.funds >= data.costOfFan){
+        //console.log('disbale if fanclub full')
+        document.getElementById('newFanButton').removeAttribute('disabled')
     }
 }
 
@@ -637,6 +715,8 @@ function holdHands(rowNum, firstID, secondID){
 
     document.getElementById('hr'+rowNum+'b').innerHTML = ""
     
+    data.numFans--
+    game.update()
     holding(firstID, secondID)
 }
 
@@ -759,7 +839,6 @@ function offspring(rowNum, id1, id2){
         }  
 
         console.log(id1)
-        data.numFans--
         deleteFan(id1, data.handHolding)
         deleteFan(id2, data.handHolding)
         data.barProgress[rowNum-1] = null
@@ -852,15 +931,28 @@ function updateBar(){
 function upgrade(item){
     switch (item){
         case "fanSlots":
-            data.fanSlots++
+            if (data.funds >= data.costOfFanclub){
+                data.funds -= data.costOfFanclub
+                data.fanSlots++
+                data.costOfFanclub *= 10
+                document.getElementById('upgradeFanclubButton').innerHTML = "Upgrade Fanclub ($"+data.costOfFanclub+")"
+            }
             break
         case 'handSlots':
-            data.handSlots++
+            if (data.funds >= data.costOfChatroom){
+                data.funds -= data.costOfChatroom
+                data.handSlots++
+                data.costOfChatroom *= 5
+                document.getElementById('upgradeChatroomButton').innerHTML = "Upgrade Chatroom ($"+data.costOfChatroom+")"
+            }
             break
         case 'studioSlots':
-            if (data.studioSlots < data.oshiName.length){
+            if (data.funds >= data.costOfStudio && data.studioSlots < data.oshiName.length){
+                data.funds -= data.costOfStudio
                 data.studioSlots++
+                data.costOfStudio *= 10
                 data.streamSchedule.push(['-','-','-','-','-','-','-']) 
+                document.getElementById('upgradeStudioButton').innerHTML = "Upgrade Studio ($"+data.costOfStudio+")"
             }         
             break
         default:
