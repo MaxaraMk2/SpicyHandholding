@@ -38,19 +38,6 @@ function loadGame(){
             
         }
     }
-
-    for (let i=0; i<data.handHolding.length;i++){
-        addHandholdRow()
-    }
-
-    for (let i = 0;i<7;i++){
-        addToSchedule(data.streamSchedule[i], i)
-    }
-
-    for (let i=0;i<data.barProgress.length;i++){
-        //
-    }
-
     game.onLoad()
 }
 
