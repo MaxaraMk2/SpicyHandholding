@@ -131,7 +131,11 @@ game = {
 function setInitialCost(){
     // update buttons in beginning
     document.getElementById('newFanButton').innerHTML = "NEW FAN ($"+data.costOfFan+")"
-    document.getElementById('debutButton').innerHTML = "NEW DEBUT (FREE)"
+    if (data.debutList.length > 0){
+        document.getElementById('debutButton').innerHTML = "NEW DEBUT ($"+data.costOfStreamer+")"
+    } else {
+        document.getElementById('debutButton').innerHTML = "NEW DEBUT (FREE)"
+    }
     document.getElementById('upgradeFanclubButton').innerHTML = "Upgrade Fanclub ($"+data.costOfFanclub+")"
     document.getElementById('upgradeChatroomButton').innerHTML = "Upgrade Chatroom ($"+data.costOfChatroom+")"
     document.getElementById('upgradeStudioButton').innerHTML = "Upgrade Studio ($"+data.costOfStudio+")"

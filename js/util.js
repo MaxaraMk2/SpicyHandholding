@@ -38,6 +38,7 @@ function loadGame(){
             
         }
     }
+    setInitialCost()
     game.onLoad()
 }
 
