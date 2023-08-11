@@ -35,8 +35,8 @@ data = {
     studioSlots: 1,
     costOfStreamer: 0,
     costOfFan: 2,
-    costOfFanclub: 500,
-    costOfChatroom: 250,
+    costOfFanclub: 5000,
+    costOfChatroom: 2500,
     costOfStudio: 10000,
 }
 
@@ -53,6 +53,7 @@ game = {
         addFanRow()
         addStudioRow()
         printSchedule()
+        setInitialCost()
         game.tick()
     },
     tick: function(){
@@ -129,6 +130,11 @@ game = {
 
 function setInitialCost(){
     // update buttons in beginning
+    document.getElementById('newFanButton').innerHTML = "NEW FAN ($"+data.costOfFan+")"
+    document.getElementById('debutButton').innerHTML = "NEW DEBUT (FREE)"
+    document.getElementById('upgradeFanclubButton').innerHTML = "Upgrade Fanclub ($"+data.costOfFanclub+")"
+    document.getElementById('upgradeChatroomButton').innerHTML = "Upgrade Chatroom ($"+data.costOfChatroom+")"
+    document.getElementById('upgradeStudioButton').innerHTML = "Upgrade Studio ($"+data.costOfStudio+")"
 }
 
 var purchaseButtons = ['newFanButton', 'debutButton', 'upgradeFanclubButton', 'upgradeChatroomButton', 'upgradeStudioButton']
@@ -838,7 +844,7 @@ function offspring(rowNum, id1, id2){
             }
         }  
 
-        console.log(id1)
+        //console.log(id1)
         deleteFan(id1, data.handHolding)
         deleteFan(id2, data.handHolding)
         data.barProgress[rowNum-1] = null
