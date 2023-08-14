@@ -1,0 +1,28 @@
+#tabBar {
+    background-color: darkblue;
+    height: 50px;
+}
+
+.tabButton{
+    color: white;
+    background-color: darkblue;
+    width: 80px;
+    height: 50px;
+    text-align: center;
+    vertical-align: middle;
+    border: none;
+}
+
+.activeTabButton{
+    color: white;
+    background-color: cornflowerblue;
+    width: 80px;
+    height: 50px;
+    text-align: center;
+    vertical-align: middle;
+    border: none;
+}
+
+.tabButton:hover{
+    background-color: cornflowerblue;
+}

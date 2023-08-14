@@ -54,6 +54,7 @@ game = {
         addStudioRow()
         printSchedule()
         setInitialCost()
+        switchTo('streamTab')
         game.tick()
     },
     tick: function(){
@@ -128,6 +129,21 @@ game = {
     }
 }
 
+var tabList = ['streamTab', 'fansTab', 'handTab', 'shopTab', 'optionsTab']
+function switchTo(targetTab){
+    for (let i=0; i<tabList.length;i++){
+        let tab = document.getElementById(tabList[i])
+        if (tabList[i] == targetTab){
+            tab.style.display = 'block'
+            document.getElementById(tabList[i]+'Button').className = 'activeTabButton'
+        } else {
+            tab.style.display = 'none'
+            document.getElementById(tabList[i]+'Button').className = 'tabButton'
+        }
+    }
+}
+
+
 function setInitialCost(){
     // update buttons in beginning
     document.getElementById('newFanButton').innerHTML = "NEW FAN ($"+data.costOfFan+")"
@@ -198,11 +214,12 @@ function liveMarker(){
         if (data.streamSchedule[i][data.currentDay] != "-"){      
             let span = document.createElement('span')    
             span.innerHTML = "\nLIVE"
-            span.setAttribute('style','color:red')
+            span.setAttribute('style','color:red;vertical-align:bottom')
             document.getElementById('s'+(i+1)+'d'+(data.currentDay+1)).append(span)
             setTimeout((id, toRemove) => {try{document.getElementById(id).removeChild(toRemove)} catch {}}, 800, 's'+(i+1)+'d'+(data.currentDay+1), span)
         } else {
             let span = document.createElement('span')
+            span.setAttribute('style', 'vertical-align:bottom')
             span.innerHTML = "\nOFFLINE"
             document.getElementById('s'+(i+1)+'d'+(data.currentDay+1)).append(span)
             setTimeout((id, toRemove) => {try {document.getElementById(id).removeChild(toRemove)} catch {}}, 800, 's'+(i+1)+'d'+(data.currentDay+1), span)
@@ -221,7 +238,7 @@ function addStudioRow(){
             for (let j=0;j<7;j++){
                 let slot = document.createElement('td')
                 slot.setAttribute('id', 's'+(i+1)+'d'+(j+1))
-                slot.setAttribute('style', "vertical-align: top; height: 50px;text-align: center;white-space: pre;")
+                slot.setAttribute('style', "vertical-align: top; height: 75px;text-align: center;white-space: pre;")
                 newRow.append(slot)
             }
             table.append(newRow)
@@ -277,7 +294,16 @@ function addStudioRow(){
 function printSchedule(){
     for (let i=0;i<data.studioSlots;i++){
         for (let j=0;j<7;j++){
-            document.getElementById('s'+(i+1)+'d'+(j+1)).innerHTML = data.streamSchedule[i][j]
+            let entry = document.getElementById('s'+(i+1)+'d'+(j+1))//.innerHTML = data.streamSchedule[i][j]
+            if (data.streamSchedule[i][j] !== '-'){
+                entry.innerHTML = ""
+                let pic = document.createElement('img')
+                pic.setAttribute('src', 'img/testminipic.png')
+                pic.setAttribute('style','height:50px')
+                entry.append(pic)
+            } else {
+                entry.innerHTML = data.streamSchedule[i][j]
+            }
         }
     }
 }
@@ -311,13 +337,14 @@ function addStreamer(name){
     if (data.funds >= data.costOfFan){
         document.getElementById('newFanButton').removeAttribute('disabled')
     }
-    let newStream = document.createElement('td')
+    let newStream = document.createElement('img')
             newStream.innerHTML = name
             newStream.setAttribute('id', name)
+            newStream.setAttribute('src', 'img/testpic.png')
             newStream.setAttribute('style','white-space:pre;vertical-align:top;text-align:center')
             newStream.setAttribute('onclick','assign("'+name+'")')
-            newStream.setAttribute('width','50px')
-            newStream.setAttribute('height','20px')
+            newStream.setAttribute('width','100px')
+            //newStream.setAttribute('height','120px')
             document.getElementById('streamlist').append(newStream)
 }
 
