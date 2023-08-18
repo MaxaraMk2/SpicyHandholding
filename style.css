@@ -26,3 +26,14 @@
 .tabButton:hover{
     background-color: cornflowerblue;
 }
+
+#select{
+    position: fixed; 
+    bottom:0px;
+    left:0px;
+    margin:10px;
+    background-color: grey;
+    display:none;
+    width: -moz-available;
+    width: -webkit-fill-available;
+}

@@ -142,3 +142,20 @@ function disableDays(dayNum, name){
                 document.getElementById('s'+(i+1)+'b'+(dayNum+1)).setAttribute('disabled', true)
     }
 }
+
+
+var numParts = 3    //number of separate sprite parts to combine
+function createSprite(id, indexList){
+    let canvas = document.getElementById(id)
+    let ctx = canvas.getContext('2d')
+    ctx.imageSmoothingEnabled = false
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+
+    let n = 0
+    for (let i=0;i<numParts;i++){
+        ctx.drawImage(spritesheet, indexList[n]*50, i*50, 50, 50, 0,0, 300,150)
+        if (n < indexList.length-1){
+            n++
+        }
+    }
+}

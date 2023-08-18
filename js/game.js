@@ -139,6 +139,9 @@ function switchTo(targetTab){
         } else {
             tab.style.display = 'none'
             document.getElementById(tabList[i]+'Button').className = 'tabButton'
+            if (targetTab !== 'fansTab' || targetTab !== 'handTab'){
+                document.getElementById('select').style.display = 'none'
+            }
         }
     }
 }
@@ -404,12 +407,13 @@ function generateFan(){
     if (data.funds >= data.costOfFan){
         data.numFans++
         let oshiNum = randIntRange(0, data.debutList.length-1)
-        let name = data.fanName[data.oshiName.indexOf(data.debutList[oshiNum])]
+        let oshiIndex = data.oshiName.indexOf(data.debutList[oshiNum])
+        let name = data.fanName[oshiIndex]
         let love = randIntRange(1,10)
         let loyalty = randIntRange(1,10)
         let money = randIntRange (1,25)
-        let oshi =  [data.oshiName[data.oshiName.indexOf(data.debutList[oshiNum])]]
-        let newbie = new Fan(name,love,loyalty,money, oshi)
+        let oshi =  [data.oshiName[oshiIndex]]
+        let newbie = new Fan(name,love,loyalty,money, oshi, [oshiIndex])
 
         let startLength  = data.currentFans.length
         if (startLength < data.fanSlots){
@@ -481,7 +485,7 @@ function addFanRow(){
             for (let j=0;j<data.fanLimit;j++){
                 let slot = document.createElement('td')
                 slot.setAttribute('id', 'fr'+(i+1)+'s'+(j+1))
-                slot.setAttribute('style', 'width:150px;border:black solid 1px;height:150px')
+                slot.setAttribute('style', 'width:175px;border:black solid 1px;height:175px')
                 newRow.append(slot)
             }
             table.append(newRow)
@@ -498,14 +502,21 @@ function makeFanEntry(fan, rowNum, slotNum){
 
     insert.setAttribute('style','white-space:pre;vertical-align:top;border:black solid 1px;text-align:center')
     insert.setAttribute('onclick','select('+fan.id+')')
-    insert.setAttribute('width','150px')
-    insert.setAttribute('height','150px')
+    insert.setAttribute('width','175px')
+    insert.setAttribute('height','175px')
     let printName = fan.name
     if (printName.length > 10){
         printName = printName.slice(0,8)
         printName = printName+'...'
     }
-    insert.innerHTML = "Type: "+printName+"\nLove: "+fan.love.toFixed(2)+"\nLoyalty: "+fan.loyalty.toFixed(2)+"\nBudget: "+fan.money.toFixed(2)+"\nOshis: "+fan.oshi.length+"\n"
+    insert.innerHTML = "\nType: "+printName+"\nLove: "+fan.love.toFixed(2)+"\nLoyalty: "+fan.loyalty.toFixed(2)+"\nBudget: "+fan.money.toFixed(2)+"\nOshis: "+fan.oshi.length+"\n"
+
+    let cnv = document.createElement('canvas')
+    cnv.setAttribute('style','width:50px;height:50px')
+    cnv.id = 'fr'+rowNum+'s'+slotNum+'img'
+    //console.log(cnv)
+    insert.prepend(cnv)
+    createSprite(cnv.id, fan.oshiIndex)
 }
 
 function printAllFans(){
@@ -550,11 +561,19 @@ function organiseFans(){
 
 
 function select(n){
+    document.getElementById('select').style.display = 'block'
     let location = searchID(data.currentFans, n)
     if (location !== undefined){
         let fan = data.currentFans[location[0]][location[1]]
         console.log(fan)
-        document.getElementById('selectData').innerHTML = ("Type: "+fan.name+"\nLove: "+fan.love.toFixed(2)+"\nLoyalty: "+fan.loyalty.toFixed(2)+"\nBudget: "+fan.money.toFixed(2)+"\nOshis: "+fan.oshi.length+'\n')
+        document.getElementById('selectData').innerHTML = ("\nType: "+fan.name+"\nLove: "+fan.love.toFixed(2)+"\nLoyalty: "+fan.loyalty.toFixed(2)+"\nBudget: "+fan.money.toFixed(2)+"\nOshis: "+fan.oshi.length+'\n')
+        
+        let cnv = document.createElement('canvas')
+        cnv.setAttribute('style','width:50px;height:50px')
+        cnv.id = 'selectDataImg'
+        document.getElementById('selectData').prepend(cnv)
+        createSprite(cnv.id, fan.oshiIndex)
+
         let fullRows = checkFull(data.handHolding)
         if (fullRows < data.handSlots){  
             document.getElementById('handButton').innerHTML = "Handholding"
@@ -571,7 +590,14 @@ function select(n){
         let location = searchID(data.handHolding, n)
         let fan = data.handHolding[location[0]][location[1]]
         console.log(fan)
-        document.getElementById('selectData').innerHTML = ("Type: "+fan.name+"\nLove: "+fan.love.toFixed(2)+"\nLoyalty: "+fan.loyalty.toFixed(2)+"\nBudget: "+fan.money.toFixed(2)+"\nOshis: "+fan.oshi.length+'\n')
+        document.getElementById('selectData').innerHTML = ("\nType: "+fan.name+"\nLove: "+fan.love.toFixed(2)+"\nLoyalty: "+fan.loyalty.toFixed(2)+"\nBudget: "+fan.money.toFixed(2)+"\nOshis: "+fan.oshi.length+'\n')
+                
+        let cnv = document.createElement('canvas')
+        cnv.setAttribute('style','width:50px;height:50px')
+        cnv.id = 'selectDataImg'
+        document.getElementById('selectData').prepend(cnv)
+        createSprite(cnv.id, fan.oshiIndex)
+        
         let fullRows = checkFull(data.currentFans)
         if (fullRows < data.fanSlots){
             document.getElementById('fansButton').setAttribute('onclick','shift('+n+')')
@@ -635,6 +661,7 @@ function shift(n){
             }
         }  
     }
+    document.getElementById('select').style.display = 'none'
     game.onLoad()
 }
 
@@ -658,14 +685,21 @@ function makeHandholdEntry(fan, rowNum, slotNum){
     if (fan.inProgress != true){
         insert.setAttribute('onclick','select('+fan.id+')')
     }
-    insert.setAttribute('width','150px')
-    insert.setAttribute('height','150px')
+    insert.setAttribute('width','175px')
+    insert.setAttribute('height','175px')
     let printName = fan.name
     if (printName.length > 10){
         printName = printName.slice(0,8)
         printName = printName+'...'
     }
-    insert.innerHTML = "Type: "+printName+"\nLove: "+fan.love.toFixed(2)+"\nLoyalty: "+fan.loyalty.toFixed(2)+"\nBudget: "+fan.money.toFixed(2)+"\nOshis: "+fan.oshi.length+'\n'
+    insert.innerHTML = "\nType: "+printName+"\nLove: "+fan.love.toFixed(2)+"\nLoyalty: "+fan.loyalty.toFixed(2)+"\nBudget: "+fan.money.toFixed(2)+"\nOshis: "+fan.oshi.length+'\n'
+
+    let cnv = document.createElement('canvas')
+    cnv.setAttribute('style','width:50px;height:50px')
+    cnv.id = 'hr'+rowNum+'s'+slotNum+'img'
+    //console.log(cnv)
+    insert.prepend(cnv)
+    createSprite(cnv.id, fan.oshiIndex)
 }
 
 function printAllHandholding(){
@@ -722,11 +756,11 @@ function addHandholdRow(){
 
             let slot1 = document.createElement('td')
             slot1.setAttribute('id', 'hr'+(i+1)+'s1')
-            slot1.setAttribute('style','width:150px;border:black solid 1px;height:150px')
+            slot1.setAttribute('style','width:150px;border:black solid 1px;height:175px')
             
             let slot2 = document.createElement('td')
             slot2.setAttribute('id', 'hr'+(i+1)+'s2')
-            slot2.setAttribute('style','width:150px;border:black solid 1px;height:150px')
+            slot2.setAttribute('style','width:150px;border:black solid 1px;height:175px')
 
             let buttonslot = document.createElement('td')
             buttonslot.setAttribute('id', 'hr'+(i+1)+'b')
@@ -810,9 +844,11 @@ async function holding(id1, id2){
 
 
     let newOshi = parent1.oshi.slice()
+    let newOshiIndex = parent1.oshiIndex.slice()
     for (let i=0;i<parent2.oshi.length;i++){
         if (!newOshi.includes(parent2.oshi[i])){
             newOshi.push(parent2.oshi[i])
+            newOshiIndex.push(parent2.oshiIndex[i])
         }
     }
 
@@ -839,6 +875,7 @@ async function holding(id1, id2){
         'loyalty': newLoyalty,
         'money': newMoney,
         'oshi':newOshi,
+        'oshiIndex':newOshiIndex,
     }
 
     if (data.inProgress[index1[0]] != true || parent1.inProgress){
@@ -853,7 +890,8 @@ async function holding(id1, id2){
 //add offspring stats to new object
 function offspring(rowNum, id1, id2){
     //console.log(rowNum)
-    let newbie = new Fan(data.offspring[rowNum-1].name, data.offspring[rowNum-1].love, data.offspring[rowNum-1].loyalty, data.offspring[rowNum-1].money, data.offspring[rowNum-1].oshi)
+    let newbie = new Fan(data.offspring[rowNum-1].name, data.offspring[rowNum-1].love, data.offspring[rowNum-1].loyalty, 
+                data.offspring[rowNum-1].money, data.offspring[rowNum-1].oshi, data.offspring[rowNum-1].oshiIndex)
         let startLength  = data.currentFans.length
         if (startLength < data.fanSlots){
             data.currentFans.push([])

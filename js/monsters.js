@@ -1,11 +1,12 @@
 class Fan{
-    constructor(name,love,loyalty,money, oshi){
+    constructor(name,love,loyalty,money, oshi, oshiIndex){
         this.name = name
         this.love = love
         this.loyalty = loyalty
         this.money = money
         this.id = data.totalFans
-        this.oshi = oshi        
+        this.oshi = oshi       
+        this.oshiIndex = oshiIndex 
         this.inProgress = false
     }
 

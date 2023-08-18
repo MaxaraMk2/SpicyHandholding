@@ -57,15 +57,7 @@
     <div id="fans">
         <span>FANCLUB</span>
         <button id="newFanButton" disabled onclick="generateFan()">NEW FAN</button>
-        <div id='select' style="position: sticky; top:0px;background-color: grey;">
-            <p style="display:inline-flex">Selected Fan:</p> 
-            <p id="selectData" style="display: inline-table;white-space:pre;width:150px;height:150px;text-align:center;border:black solid 1px;padding:10px">None</p>
-            <div>
-                <button id="fansButton" onclick="shift()" style="display:none;">Fanclub</button>
-                <button id="handButton" onclick="shift()" style="display:none">Handholding</button>
-                <button id="deleteButton" style="display:none">Delete</button>
-            </div>
-        </div>
+
 
         
         <table id="fansTable">
@@ -86,6 +78,16 @@
         </table>
     </div>
 </div> 
+
+<div id='select'>
+    <p style="display:inline-flex">Selected Fan:</p> 
+    <p id="selectData" style="display: inline-table;white-space:pre;width:150px;height:150px;text-align:center;border:black solid 1px;padding:10px">None</p>
+    <div>
+        <button id="fansButton" onclick="shift()" style="display:none;">Fanclub</button>
+        <button id="handButton" onclick="shift()" style="display:none">Handholding</button>
+        <button id="deleteButton" style="display:none">Delete</button>
+    </div>
+</div>
 
 <div id="shopTab">
     <div id="shop">
@@ -114,6 +116,8 @@
 
     <script>
         game.start()
+        spritesheet = new Image()
+        spritesheet.src = 'img/spritesheet.png'
     </script>
 
 </body>
