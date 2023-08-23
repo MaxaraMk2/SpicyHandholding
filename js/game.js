@@ -88,7 +88,7 @@ game = {
         }
     },
     update: function (){
-        document.getElementById('fundsValue').innerHTML = "$"+data.funds.toFixed(2)
+        document.getElementById('fundsValue').innerHTML = "Funds: "+data.funds.toFixed(2)
         
         if (data.currentFans.length < data.fanSlots){
             data.currentFans.push([])
@@ -234,9 +234,16 @@ function liveMarker(){
 function addStudioRow(){
     for (let i=0;i<data.studioSlots;i++){
         if(document.getElementById('studio'+(i+1)) === null){
-            let table = document.getElementById('week')
+            let table = ""
+            if ((i+1) % 2 == 0){
+                table = document.getElementById('week2')
+                table.style.display = ''
+            } else {
+                table = document.getElementById('week1')
+            }
             let newRow = document.createElement('tr')
             newRow.setAttribute('id', 'studio'+(i+1))
+            newRow.setAttribute('style', 'border:solid black 1px')
 
             for (let j=0;j<7;j++){
                 let slot = document.createElement('td')
@@ -251,7 +258,12 @@ function addStudioRow(){
         }
 
         if (document.getElementById('sButton'+(i+1)) === null){
-            let table = document.getElementById('scheduleButtons')
+            let table = ""
+            if ((i+1) % 2 == 0){
+                table = document.getElementById('scheduleButtons2')
+            } else {
+                table = document.getElementById('scheduleButtons1')
+            }
             let newRow = document.createElement('tr')
             newRow.setAttribute('id', 'sButton'+(i+1))
 
@@ -339,6 +351,7 @@ function debutStreamer(){
 function addStreamer(name){
     if (data.funds >= data.costOfFan){
         document.getElementById('newFanButton').removeAttribute('disabled')
+        disableBuyIfFanclubFull()
     }
     let newStream = document.createElement('img')
             newStream.innerHTML = name
@@ -361,8 +374,9 @@ function assign(name){
     for (let i=0;i<data.studioSlots;i++){
         for (let j=0;j<7;j++){
             let button = document.getElementById('s'+(i+1)+'b'+(j+1))
-            button.setAttribute('style','display:inline-flex')
+            button.setAttribute('style','display:inline;text-align:center;vertical-align:middle;width:50px')
             button.setAttribute('onclick','addToSchedule("'+name+'",'+i+','+j+')')
+            button.className = 'tabButton'
             if (data.streamSchedule[i][j] == name){
                 button.setAttribute('disabled', true)
             } else {
@@ -374,7 +388,11 @@ function assign(name){
         if(document.getElementById('sLabel'+(i+1)) === null){
             let label = document.createElement('span')
             label.id = 'sLabel'+(i+1)
-            label.innerHTML = 'Studio '+(i+1)+': '
+            if ((i+1)<10){
+                label.innerHTML = 'Studio 0'+(i+1)+': '
+            } else {
+                label.innerHTML = 'Studio '+(i+1)+': '
+            }
             document.getElementById('sButton'+(i+1)).prepend(label)
         }
 
@@ -756,11 +774,11 @@ function addHandholdRow(){
 
             let slot1 = document.createElement('td')
             slot1.setAttribute('id', 'hr'+(i+1)+'s1')
-            slot1.setAttribute('style','width:150px;border:black solid 1px;height:175px')
+            slot1.setAttribute('style','width:175px;border:black solid 1px;height:175px')
             
             let slot2 = document.createElement('td')
             slot2.setAttribute('id', 'hr'+(i+1)+'s2')
-            slot2.setAttribute('style','width:150px;border:black solid 1px;height:175px')
+            slot2.setAttribute('style','width:175px;border:black solid 1px;height:175px')
 
             let buttonslot = document.createElement('td')
             buttonslot.setAttribute('id', 'hr'+(i+1)+'b')
@@ -978,7 +996,7 @@ function updateBar(){
                 let bar = document.getElementById('barProgress'+(i+1))
                 bar.setAttribute('style','background-color:green;height:15px;width:'+data.barProgress[i]['green']+'px')
                 document.getElementById('timeLeft'+(i+1)).innerHTML = formatTime(data.barProgress[i]['duration'])
-                document.getElementById('timeLeft'+(i+1)).setAttribute('style', 'position:relative;left:25px')
+                document.getElementById('timeLeft'+(i+1)).setAttribute('style', 'position:relative;')
                 if (checkFull(data.currentFans) == data.fanSlots){
                     /*
                     if (document.getElementById('full'+(i+1)) === null){

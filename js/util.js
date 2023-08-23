@@ -9,8 +9,9 @@ function prettify(input){
 	return output;
 }
 
-function makeObject(){
-
+function moneyFormat(num){
+    let result = Intl.NumberFormat('en-US',{style: 'currency', currency:'USD'}).format(num)
+    return result
 }
 
 function saveGame(){
@@ -43,7 +44,13 @@ function loadGame(){
 }
 
 function deleteSave(){
-    localStorage.removeItem("save")
+    let confirmPhrase = prompt("Type 'delete my save' to confirm save file deletion.")
+    if (confirmPhrase === 'delete my save'){
+        localStorage.removeItem("save")
+        alert('Save file deleted!')
+    } else {
+        alert('Your save file will remain!')
+    }
 }
 
 function appear(list=[]){
@@ -156,6 +163,8 @@ function createSprite(id, indexList){
         ctx.drawImage(spritesheet, indexList[n]*50, i*50, 50, 50, 0,0, 300,150)
         if (n < indexList.length-1){
             n++
+        } else {
+            n = 0
         }
     }
 }

@@ -27,6 +27,10 @@
     background-color: cornflowerblue;
 }
 
+.tabButton:disabled{
+    background-color: grey;
+}
+
 #select{
     position: fixed; 
     bottom:0px;
@@ -37,3 +41,4 @@
     width: -moz-available;
     width: -webkit-fill-available;
 }
+

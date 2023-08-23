@@ -5,11 +5,17 @@
 <link rel="stylesheet" href="style.css">
 <head>
     <div id='tabBar'>
-        <button id='streamTabButton' class="tabButton" onclick="switchTo('streamTab')">Studio</button>
-        <button id='fansTabButton' class="tabButton" onclick="switchTo('fansTab')">Fanclub</button>
-        <button id='handTabButton' class="tabButton" onclick="switchTo('handTab')">Chatroom</button>
-        <button id='shopTabButton' class="tabButton" onclick="switchTo('shopTab')">Shop</button>
-        <button id='optionsTabButton' class="tabButton" onclick="switchTo('optionsTab')">Options</button>
+        <div id="funds" style="display:inline;position:relative;top:25%;left:10px;color:white">
+            <p id="fundsValue" style="display:contents">Funds: $10.00</p>
+        </div>
+        <div style="display:inline; float: right;">
+            <button id='streamTabButton' class="tabButton" onclick="switchTo('streamTab')">Studio</button>
+            <button id='fansTabButton' class="tabButton" onclick="switchTo('fansTab')">Fanclub</button>
+            <button id='handTabButton' class="tabButton" onclick="switchTo('handTab')">Chatroom</button>
+            <button id='shopTabButton' class="tabButton" onclick="switchTo('shopTab')">Shop</button>
+            <button id='optionsTabButton' class="tabButton" onclick="switchTo('optionsTab')">Options</button>
+   
+        </div>
     </div>
 </head>
 
@@ -19,27 +25,27 @@
     <script src="js/monsters.js"></script>
 
 <div id="streamTab">
-    <div id="stream">
-        <button id="debutButton" onclick="debutStreamer()">NEW DEBUT</button>
-        <span>STREAMERS</span>
-        <table id="streamlist">
-
+    <div id="stream" style="text-align:center">
+        <br>
+            <button class='tabButton' style="width:300px" id="debutButton" onclick="debutStreamer()">NEW DEBUT</button>
+            <h2>STREAMERS</h2>
+        <table id="streamlist" style="margin:auto">
         </table>
-        <span id="currentStreamer"></span>
-
-        <table id="scheduleButtons">
-            
-        </table>
-
+        <p id="currentStreamer"></p>
+        <div style="display: flex;">
+            <table id="scheduleButtons1" style="flex:50%;height: 50px;">  
+            </table>
+            <table  id="scheduleButtons2" style="flex:50%;height: 50px;">  
+            </table>
         </div>
+    </div>
 
-        <div id="studio">
-            <span>STUDIO</span>
-            <div id="funds">
-                Funds: <p id="fundsValue" style="display:contents">$10.00</p>
-            </div>
-            <table id="week">
-                <tr style="vertical-align: bottom;height: 20px;text-align: center;">
+        <div style="text-align: center;">
+            <br>
+            <h2>STUDIOS</h2>
+ 
+            <table id="week1" style="float:left; width:49% ;border-collapse: collapse;">
+                <tr style="vertical-align: bottom;height: 20px;text-align: center;border:solid black 1px;background-color: darkblue; color:white">
                     <th width="80px">Monday</th>
                     <th width="80px">Tuesday</th>
                     <th width="80px">Wednesday</th>
@@ -50,17 +56,31 @@
                 </tr>
                 
             </table>
-        </div>
+
+            <table id="week2" style="float:right; width:49%; display:none;border-collapse: collapse;">
+                <tr style="vertical-align: bottom;height: 20px;text-align: center; border:solid black 1px;background-color: darkblue; color:white">
+                    <th width="80px">Monday</th>
+                    <th width="80px">Tuesday</th>
+                    <th width="80px">Wednesday</th>
+                    <th width="80px">Thursday</th>
+                    <th width="80px">Friday</th>
+                    <th width="80px">Saturday</th>
+                    <th width="80px">Sunday</th>
+                </tr>
+                
+            </table>
+            </div>
+    </div>
 </div>
 
 <div id="fansTab">
-    <div id="fans">
-        <span>FANCLUB</span>
-        <button id="newFanButton" disabled onclick="generateFan()">NEW FAN</button>
-
-
-        
-        <table id="fansTable">
+    <div id="fans" style="text-align: center;">
+        <br>
+        <div>
+            <button class='tabButton' id="newFanButton" style='width:300px' disabled onclick="generateFan()">NEW FAN</button>
+        </div>
+        <br>
+        <table id="fansTable" style="margin-left: auto;margin-right: auto;">
             <tbody id="fansData">
             </tbody>
         </table>
@@ -68,9 +88,7 @@
 </div>
 
 <div id="handTab">
-    <div id="hand">
-
-        <span>CHATROOM</span>
+    <div id="hand" style="text-align:center">
         <table id="handTable">
             <tbody id='handData'>
 
@@ -91,17 +109,17 @@
 
 <div id="shopTab">
     <div id="shop">
-        <span>SHOP</span>
-        <table id='shopTable'>
+        <br>
+        <table id='shopTable' style="margin-left: auto;margin-right: auto;">
             <tbody id="shopData">
                 <td>
-                    <button id='upgradeFanclubButton' onclick="upgrade('fanSlots')">Upgrade Fanclub</button>
+                    <button class='tabButton' style='width:200px' id='upgradeFanclubButton' onclick="upgrade('fanSlots')">Upgrade Fanclub</button>
                 </td>
                 <td>
-                    <button id='upgradeChatroomButton' onclick="upgrade('handSlots')">Upgrade Chatroom</button>
+                    <button class='tabButton' style='width:200px' id='upgradeChatroomButton' onclick="upgrade('handSlots')">Upgrade Chatroom</button>
                 </td>
                 <td>
-                    <button id='upgradeStudioButton' onclick="upgrade('studioSlots')">Upgrade Studio</button>
+                    <button class='tabButton' style='width:200px' id='upgradeStudioButton' onclick="upgrade('studioSlots')">Upgrade Studio</button>
                 </td>
             </tbody>
         </table>
@@ -109,9 +127,15 @@
 </div>
 
 <div id="optionsTab">
-    <button onclick="saveGame()">SAVE</button>
-    <button onclick="loadGame()">LOAD</button>
-    <button onclick="deleteSave()">DELETE SAVE</button>
+    <div style="text-align: center;">
+        <br>
+        <button class='tabButton' style="width:300px;display:block;margin: auto;" onclick="saveGame()">SAVE</button>
+        <br>
+        <button class='tabButton' style="width:300px;display:block;margin: auto;" onclick="loadGame()">LOAD</button>
+        <br>
+        <button class="tabButton" style="width:300px;display:block;margin: auto;" onclick="deleteSave()">DELETE SAVE</button>
+        <br>
+    </div>
 </div>
 
     <script>
