@@ -1,3 +1,21 @@
+body {
+    background-color: white;
+    color: black
+}
+
+.darkMode{
+    background-color: #121212;
+    color: white;
+}
+
+.lightTable{
+    border: solid black 1px;
+}
+
+.darkTable{
+    border: solid white 1px
+}
+
 #tabBar {
     background-color: darkblue;
     height: 50px;
@@ -42,3 +60,12 @@
     width: -webkit-fill-available;
 }
 
+@keyframes maxUpdateLight {
+    from {color: lightgreen;}
+    to {color: black}
+}
+
+@keyframes maxUpdateDark {
+    from {color: lightgreen}
+    to {color:white}
+}

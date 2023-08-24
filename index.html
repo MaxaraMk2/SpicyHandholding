@@ -45,7 +45,7 @@
             <h2>STUDIOS</h2>
  
             <table id="week1" style="float:left; width:49% ;border-collapse: collapse;">
-                <tr style="vertical-align: bottom;height: 20px;text-align: center;border:solid black 1px;background-color: darkblue; color:white">
+                <tr class='lightTable' style="vertical-align: bottom;height: 20px;text-align: center;background-color: darkblue; color:white">
                     <th width="80px">Monday</th>
                     <th width="80px">Tuesday</th>
                     <th width="80px">Wednesday</th>
@@ -58,7 +58,7 @@
             </table>
 
             <table id="week2" style="float:right; width:49%; display:none;border-collapse: collapse;">
-                <tr style="vertical-align: bottom;height: 20px;text-align: center; border:solid black 1px;background-color: darkblue; color:white">
+                <tr class='lightTable' style="vertical-align: bottom;height: 20px;text-align: center;background-color: darkblue; color:white">
                     <th width="80px">Monday</th>
                     <th width="80px">Tuesday</th>
                     <th width="80px">Wednesday</th>
@@ -89,8 +89,21 @@
 
 <div id="handTab">
     <div id="hand" style="text-align:center">
-        <table id="handTable">
-            <tbody id='handData'>
+        <br>
+        <div id='maxStatBox' style="height:50px">
+            <p id='maxLoveDesc' style="float:left;width:33%"></p>
+            <p id='maxLoyaltyDesc' style="float:left;width:33%"></p>
+            <p id='maxBudgetDesc' style="float:left;width:33%"></p>
+        </div>
+        <br>
+        <table id="handData1" style="float:left; margin-left:7vw;">
+            <tbody id='oldhandData'>
+
+            </tbody>
+        </table>
+
+        <table id="handData2" style="float:left; ">
+            <tbody id='old1handData'>
 
             </tbody>
         </table>
@@ -128,6 +141,8 @@
 
 <div id="optionsTab">
     <div style="text-align: center;">
+        <br>
+        <button id="darkLightButton" class='tabButton' style="width:300px;display:block;margin: auto;" onclick="toggleDarkMode()">DARK MODE</button>
         <br>
         <button class='tabButton' style="width:300px;display:block;margin: auto;" onclick="saveGame()">SAVE</button>
         <br>

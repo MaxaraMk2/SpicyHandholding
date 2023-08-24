@@ -1,4 +1,5 @@
 data = {
+    lightMode: true,
     time: {
         saveDate: 0,
         currentDate:0,
@@ -88,7 +89,7 @@ game = {
         }
     },
     update: function (){
-        document.getElementById('fundsValue').innerHTML = "Funds: "+data.funds.toFixed(2)
+        document.getElementById('fundsValue').innerHTML = "Funds: $"+data.funds.toFixed(2)
         
         if (data.currentFans.length < data.fanSlots){
             data.currentFans.push([])
@@ -100,12 +101,15 @@ game = {
             data.costOfFan = 2**data.numFans
         }
         document.getElementById('newFanButton').innerHTML = "NEW FAN ($"+data.costOfFan.toFixed(2)+")"
+
+        
     },
     onLoad: function(){
         //resetTables()
         document.getElementById('streamlist').innerHTML = ""
         document.getElementById('fansData').innerHTML = ""
-        document.getElementById('handData').innerHTML = ""
+        document.getElementById('handData1').innerHTML = ""
+        document.getElementById('handData2').innerHTML = ""
         //console.log(data.currentFans)
         //console.log('loading..')
 
@@ -144,6 +148,9 @@ function switchTo(targetTab){
             }
         }
     }
+    document.getElementById('maxLoveDesc').style.animation = ''
+    document.getElementById('maxLoyaltyDesc').style.animation = ''
+    document.getElementById('maxBudgetDesc').style.animation = ''
 }
 
 
@@ -158,6 +165,10 @@ function setInitialCost(){
     document.getElementById('upgradeFanclubButton').innerHTML = "Upgrade Fanclub ($"+data.costOfFanclub+")"
     document.getElementById('upgradeChatroomButton').innerHTML = "Upgrade Chatroom ($"+data.costOfChatroom+")"
     document.getElementById('upgradeStudioButton').innerHTML = "Upgrade Studio ($"+data.costOfStudio+")"
+
+    document.getElementById('maxLoveDesc').innerHTML = "Maximum LOVE: "+data.maxLove
+    document.getElementById('maxLoyaltyDesc').innerHTML = "Maximum LOYALTY: "+data.maxLoyalty
+    document.getElementById('maxBudgetDesc').innerHTML = "Maximum BUDGET: $"+data.maxMoney
 }
 
 var purchaseButtons = ['newFanButton', 'debutButton', 'upgradeFanclubButton', 'upgradeChatroomButton', 'upgradeStudioButton']
@@ -243,7 +254,11 @@ function addStudioRow(){
             }
             let newRow = document.createElement('tr')
             newRow.setAttribute('id', 'studio'+(i+1))
-            newRow.setAttribute('style', 'border:solid black 1px')
+            if (data.lightMode){
+                newRow.className = 'lightTable'
+            } else {
+                newRow.className = 'darkTable'
+            }
 
             for (let j=0;j<7;j++){
                 let slot = document.createElement('td')
@@ -503,7 +518,12 @@ function addFanRow(){
             for (let j=0;j<data.fanLimit;j++){
                 let slot = document.createElement('td')
                 slot.setAttribute('id', 'fr'+(i+1)+'s'+(j+1))
-                slot.setAttribute('style', 'width:175px;border:black solid 1px;height:175px')
+                slot.setAttribute('style', 'width:175px;height:175px')
+                if (data.lightMode){
+                    slot.className = 'lightTable'
+                } else {
+                    slot.className = 'darkTable'
+                }
                 newRow.append(slot)
             }
             table.append(newRow)
@@ -518,10 +538,11 @@ function makeFanEntry(fan, rowNum, slotNum){
     //console.log("fan entry: "+rowNum+','+slotNum)
     let insert = document.getElementById('fr'+rowNum+'s'+slotNum)
 
-    insert.setAttribute('style','white-space:pre;vertical-align:top;border:black solid 1px;text-align:center')
+    insert.setAttribute('style','white-space:pre;vertical-align:top;text-align:center')
     insert.setAttribute('onclick','select('+fan.id+')')
     insert.setAttribute('width','175px')
     insert.setAttribute('height','175px')
+ 
     let printName = fan.name
     if (printName.length > 10){
         printName = printName.slice(0,8)
@@ -699,7 +720,7 @@ function makeHandholdEntry(fan, rowNum, slotNum){
     //console.log('hand entry: '+rowNum+','+slotNum)
     let insert = document.getElementById('hr'+rowNum+'s'+slotNum)
 
-    insert.setAttribute('style','white-space:pre;vertical-align:top;border: black solid 1px;text-align:center')
+    insert.setAttribute('style','white-space:pre;vertical-align:top;text-align:center')
     if (fan.inProgress != true){
         insert.setAttribute('onclick','select('+fan.id+')')
     }
@@ -721,7 +742,8 @@ function makeHandholdEntry(fan, rowNum, slotNum){
 }
 
 function printAllHandholding(){
-    document.getElementById('handData').innerHTML == ""
+    document.getElementById('handData1').innerHTML == ""
+    document.getElementById('handData2').innerHTML = ""
     for (let i=0; i<data.handHolding.length;i++){
         addHandholdRow()
         let row = document.getElementById('handRow'+(i+1))
@@ -744,7 +766,8 @@ function checkForButton(){
             let newButton = document.createElement('button')
             newButton.setAttribute('id', 'button'+(i+1))
             newButton.setAttribute('onclick','holdHands('+[(i+1), data.handHolding[i][0].id, data.handHolding[i][1].id]+')')
-            newButton.setAttribute('style', 'white-space:pre')
+            newButton.setAttribute('style', 'white-space:pre;width:100px')
+            newButton.className = 'tabButton'
             let fullRows = checkFull(data.currentFans)
             if (fullRows == data.fanSlots) { 
                 newButton.setAttribute('disabled', true)
@@ -768,20 +791,34 @@ function checkForButton(){
 function addHandholdRow(){
     for (let i=0;i<data.handSlots;i++){
         if(document.getElementById('handRow'+(i+1)) === null){
-            let table = document.getElementById('handData')
+            let table = ""
+            if ((i+1) % 2 == 0){
+                table = document.getElementById('handData2')
+            } else {
+                table = document.getElementById('handData1')
+            }
             let newRow = document.createElement('tr')
             newRow.setAttribute('id', 'handRow'+(i+1))
 
             let slot1 = document.createElement('td')
             slot1.setAttribute('id', 'hr'+(i+1)+'s1')
-            slot1.setAttribute('style','width:175px;border:black solid 1px;height:175px')
+            slot1.setAttribute('style','width:175px;height:175px')
             
             let slot2 = document.createElement('td')
             slot2.setAttribute('id', 'hr'+(i+1)+'s2')
-            slot2.setAttribute('style','width:175px;border:black solid 1px;height:175px')
+            slot2.setAttribute('style','width:175px;height:175px')
+
+            if (data.lightMode){
+                slot1.className = 'lightTable'
+                slot2.className = 'lightTable'
+            } else {
+                slot1.className = 'darkTable'
+                slot2.className = 'darkTable'
+            }
 
             let buttonslot = document.createElement('td')
             buttonslot.setAttribute('id', 'hr'+(i+1)+'b')
+            buttonslot.setAttribute('style','width:175px;height:175px')
             //buttonslot.setAttribute('style','vertical-align:top')
 
             newRow.append(slot1)
@@ -834,8 +871,16 @@ async function holding(id1, id2){
     if (parent1.love + parent2.love == data.maxLove*2){
         if (data.maxLove <= 95){
             data.maxLove += 5
+            let loveText = document.getElementById('maxLoveDesc')
+            loveText.innerHTML = "Maximum LOVE: "+data.maxLove
+            if (data.lightMode){
+                loveText.style.animation = 'maxUpdateLight 3s'
+            } else {
+                loveText.style.animation = 'maxUpdateDark 3s'
+            }
         }
     }
+    
     if (newLove > data.maxLove){
         newLove = data.maxLove
     }
@@ -844,6 +889,13 @@ async function holding(id1, id2){
     if (parent1.loyalty + parent2.loyalty == data.maxLoyalty*2){
         if (data.maxLoyalty <= 95){
             data.maxLoyalty += 5
+            let loyaltyText = document.getElementById('maxLoyaltyDesc')
+            loyaltyText.innerHTML = "Maximum LOYALTY: "+data.maxLoyalty
+            if (data.lightMode){
+                loyaltyText.style.animation = 'maxUpdateLight 3s'
+            } else {
+                loyaltyText.style.animation = 'maxUpdateDark 3s'
+            }
         }
     }
     if (newLoyalty > data.maxLoyalty){
@@ -854,6 +906,13 @@ async function holding(id1, id2){
     if (parent1.money + parent2.money == data.maxMoney*2){
         if (data.maxMoney <= 1000){
             data.maxMoney += 10
+            let moneyText = document.getElementById('maxBudgetDesc')
+            moneyText.innerHTML = "Maximum BUDGET: $"+data.maxMoney
+            if (data.lightMode){
+                moneyText.style.animation = 'maxUpdateLight 3s'
+            } else {
+                moneyText.style.animation = 'maxUpdateDark 3s'
+            }
         }
     }
     if (newMoney > data.maxMoney){
@@ -960,7 +1019,7 @@ function makeBar(rowNum){
     let barSlot = document.getElementById('hr'+rowNum+'b')
     barSlot.innerHTML = ""
     let bar = document.createElement('div')
-    bar.setAttribute('style','background-color:grey;height:15px;width:100px')
+    bar.setAttribute('style','background-color:grey;height:15px;width:100px;margin:auto')
 
     let barProgress = document.createElement('div')
     barProgress.setAttribute('style','background-color:green;height:15px;width:0px')
