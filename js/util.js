@@ -40,8 +40,8 @@ function loadGame(){
         }
     }
     setInitialCost()
-    //TODO: load dark mode state
     game.onLoad()
+    switchDarkModeClasses()
 }
 
 function deleteSave(){
@@ -171,21 +171,25 @@ function createSprite(id, indexList){
 }
 
 function toggleDarkMode(){
+    if (localStorage.getItem('darkmode') == undefined){
+        localStorage.setItem('darkmode', true)
+    } else {
+        localStorage.removeItem('darkmode')
+    }
     switchDarkModeClasses()
-    data.lightMode = !data.lightMode
 }
 
 function switchDarkModeClasses(){
-    if (data.lightMode){
+    if (localStorage.darkmode){
         document.getElementById('darkLightButton').innerHTML = 'LIGHT MODE'
-        document.body.className = 'darkMode'
+        document.body.classList.add('darkMode')
         let list = document.getElementsByClassName('lightTable')
         while (list.length > 0){
             list[0].className = 'darkTable'
         }
     } else {
         document.getElementById('darkLightButton').innerHTML = 'DARK MODE'
-        document.body.className = ''
+        document.body.classList.remove('darkMode')
         let list = document.getElementsByClassName('darkTable')
         while (list.length > 0){
             list[0].className = 'lightTable'

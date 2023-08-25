@@ -56,6 +56,7 @@ game = {
         printSchedule()
         setInitialCost()
         switchTo('streamTab')
+        switchDarkModeClasses()
         game.tick()
     },
     tick: function(){
@@ -254,10 +255,10 @@ function addStudioRow(){
             }
             let newRow = document.createElement('tr')
             newRow.setAttribute('id', 'studio'+(i+1))
-            if (data.lightMode){
-                newRow.className = 'lightTable'
-            } else {
+            if (localStorage.darkmode){
                 newRow.className = 'darkTable'
+            } else {
+                newRow.className = 'lightTable'
             }
 
             for (let j=0;j<7;j++){
@@ -519,10 +520,10 @@ function addFanRow(){
                 let slot = document.createElement('td')
                 slot.setAttribute('id', 'fr'+(i+1)+'s'+(j+1))
                 slot.setAttribute('style', 'width:175px;height:175px')
-                if (data.lightMode){
-                    slot.className = 'lightTable'
-                } else {
+                if (localStorage.darkmode){
                     slot.className = 'darkTable'
+                } else {
+                    slot.className = 'lightTable'
                 }
                 newRow.append(slot)
             }
@@ -598,7 +599,7 @@ function organiseFans(){
 }
 
 
-
+//TODO: make select UI pretty
 function select(n){
     document.getElementById('select').style.display = 'block'
     let location = searchID(data.currentFans, n)
@@ -808,12 +809,12 @@ function addHandholdRow(){
             slot2.setAttribute('id', 'hr'+(i+1)+'s2')
             slot2.setAttribute('style','width:175px;height:175px')
 
-            if (data.lightMode){
-                slot1.className = 'lightTable'
-                slot2.className = 'lightTable'
-            } else {
+            if (localStorage.darkmode){
                 slot1.className = 'darkTable'
                 slot2.className = 'darkTable'
+            } else {
+                slot1.className = 'lightTable'
+                slot2.className = 'lightTable'
             }
 
             let buttonslot = document.createElement('td')
@@ -873,10 +874,10 @@ async function holding(id1, id2){
             data.maxLove += 5
             let loveText = document.getElementById('maxLoveDesc')
             loveText.innerHTML = "Maximum LOVE: "+data.maxLove
-            if (data.lightMode){
-                loveText.style.animation = 'maxUpdateLight 3s'
-            } else {
+            if (localStorage.darkmode){
                 loveText.style.animation = 'maxUpdateDark 3s'
+            } else {
+                loveText.style.animation = 'maxUpdateLight 3s'
             }
         }
     }
@@ -891,10 +892,10 @@ async function holding(id1, id2){
             data.maxLoyalty += 5
             let loyaltyText = document.getElementById('maxLoyaltyDesc')
             loyaltyText.innerHTML = "Maximum LOYALTY: "+data.maxLoyalty
-            if (data.lightMode){
-                loyaltyText.style.animation = 'maxUpdateLight 3s'
-            } else {
+            if (localStorage.darkmode){
                 loyaltyText.style.animation = 'maxUpdateDark 3s'
+            } else {
+                loyaltyText.style.animation = 'maxUpdateLight 3s'
             }
         }
     }
@@ -908,10 +909,10 @@ async function holding(id1, id2){
             data.maxMoney += 10
             let moneyText = document.getElementById('maxBudgetDesc')
             moneyText.innerHTML = "Maximum BUDGET: $"+data.maxMoney
-            if (data.lightMode){
-                moneyText.style.animation = 'maxUpdateLight 3s'
-            } else {
+            if (localStorage.darkmode){
                 moneyText.style.animation = 'maxUpdateDark 3s'
+            } else {
+                moneyText.style.animation = 'maxUpdateLight 3s'
             }
         }
     }
