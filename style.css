@@ -43,6 +43,7 @@ body {
 
 .tabButton:hover{
     background-color: cornflowerblue;
+    cursor: pointer;
 }
 
 .tabButton:disabled{
@@ -50,14 +51,14 @@ body {
 }
 
 #select{
-    position: fixed; 
-    bottom:0px;
-    left:0px;
-    margin:10px;
-    background-color: grey;
+    background-color: #404040;
     display:none;
-    width: -moz-available;
-    width: -webkit-fill-available;
+    position: fixed; 
+    width: 500px;
+    bottom: 5px;
+    left: 50%;
+    transform: translate(-50%);
+    border: solid white 1px;
 }
 
 @keyframes maxUpdateLight {
@@ -68,4 +69,29 @@ body {
 @keyframes maxUpdateDark {
     from {color: lightgreen}
     to {color:white}
+}
+
+@keyframes bringUpSelect {
+    from {bottom: -500px}
+    to {bottom: 5px}
+}
+
+@keyframes bringDownSelect {
+    from {bottom: 5px}
+    to {bottom: -500px}
+}
+
+@keyframes sendToChatroom{
+    
+}
+
+#closeSelect {
+    float:right;
+    font-size: 32px;
+    transform: translate(-5px,-5px);
+}
+
+#closeSelect:hover{
+    color: black;
+    cursor: pointer;
 }

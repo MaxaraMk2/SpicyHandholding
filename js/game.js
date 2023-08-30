@@ -152,6 +152,7 @@ function switchTo(targetTab){
     document.getElementById('maxLoveDesc').style.animation = ''
     document.getElementById('maxLoyaltyDesc').style.animation = ''
     document.getElementById('maxBudgetDesc').style.animation = ''
+    document.getElementById('select').style.animation = ''
 }
 
 
@@ -599,20 +600,33 @@ function organiseFans(){
 }
 
 
-//TODO: make select UI pretty
+//TODO: animate sending to chatroom/fanclub
 function select(n){
     document.getElementById('select').style.display = 'block'
+    document.getElementById('select').style.animation = ''
+    document.getElementById('select').style.animation = 'bringUpSelect 0.3s'
     let location = searchID(data.currentFans, n)
     if (location !== undefined){
         let fan = data.currentFans[location[0]][location[1]]
         console.log(fan)
-        document.getElementById('selectData').innerHTML = ("\nType: "+fan.name+"\nLove: "+fan.love.toFixed(2)+"\nLoyalty: "+fan.loyalty.toFixed(2)+"\nBudget: "+fan.money.toFixed(2)+"\nOshis: "+fan.oshi.length+'\n')
-        
+        document.getElementById('selectData').innerHTML = ''
+        if (document.getElementById('descText') !== null){
+            document.getElementById('descText').remove()
+        }
+
+        let newDiv = document.createElement('div')
+        newDiv.id = 'descText'
+        newDiv.innerHTML =  "\nType: "
+            +fan.name+"\nLove: "+fan.love.toFixed(2)+"\nLoyalty: "+fan.loyalty.toFixed(2)+"\nBudget: "
+            +fan.money.toFixed(2)+"\nOshis: "+fan.oshi.length+'\n'
+        newDiv.style.height = '175px'
+        document.getElementById('selectDataText').prepend(newDiv)
+
         let cnv = document.createElement('canvas')
-        cnv.setAttribute('style','width:50px;height:50px')
+        cnv.setAttribute('style','width:175px;height:175px')
         cnv.id = 'selectDataImg'
         document.getElementById('selectData').prepend(cnv)
-        createSprite(cnv.id, fan.oshiIndex)
+        createSprite(cnv.id, fan.oshiIndex, false)
 
         let fullRows = checkFull(data.handHolding)
         if (fullRows < data.handSlots){  
@@ -624,19 +638,32 @@ function select(n){
             document.getElementById('handButton').innerHTML = "Chatroom Full!"
         }
         document.getElementById('deleteButton').setAttribute('onclick','deleteFan('+n+', data.currentFans, true)')
+        document.getElementById('deleteButton').innerHTML = 'Delete'
+        document.getElementById('deleteButton').style.backgroundColor = ''
         disappear(['fansButton'])
         appear(['handButton','deleteButton'])
     } else{
         let location = searchID(data.handHolding, n)
         let fan = data.handHolding[location[0]][location[1]]
         console.log(fan)
-        document.getElementById('selectData').innerHTML = ("\nType: "+fan.name+"\nLove: "+fan.love.toFixed(2)+"\nLoyalty: "+fan.loyalty.toFixed(2)+"\nBudget: "+fan.money.toFixed(2)+"\nOshis: "+fan.oshi.length+'\n')
-                
+        document.getElementById('selectData').innerHTML = ''
+        if (document.getElementById('descText') !== null){
+            document.getElementById('descText').remove()
+        }
+
+        let newDiv = document.createElement('div')
+        newDiv.id = 'descText'
+        newDiv.innerHTML =  "\nType: "
+            +fan.name+"\nLove: "+fan.love.toFixed(2)+"\nLoyalty: "+fan.loyalty.toFixed(2)+"\nBudget: "
+            +fan.money.toFixed(2)+"\nOshis: "+fan.oshi.length+'\n'
+        newDiv.style.height = '175px'
+        document.getElementById('selectDataText').prepend(newDiv)
+
         let cnv = document.createElement('canvas')
-        cnv.setAttribute('style','width:50px;height:50px')
+        cnv.setAttribute('style','width:175px;height:175px')
         cnv.id = 'selectDataImg'
         document.getElementById('selectData').prepend(cnv)
-        createSprite(cnv.id, fan.oshiIndex)
+        createSprite(cnv.id, fan.oshiIndex, false)
         
         let fullRows = checkFull(data.currentFans)
         if (fullRows < data.fanSlots){
@@ -648,6 +675,8 @@ function select(n){
             document.getElementById('fansButton').innerHTML = "Fanclub Full!"
         }
         document.getElementById('deleteButton').setAttribute('onclick','deleteFan('+n+', data.handHolding, true)')
+        document.getElementById('deleteButton').innerHTML = 'Delete'
+        document.getElementById('deleteButton').style.backgroundColor = ''
         disappear(['handButton'])
         appear(['fansButton','deleteButton'])
     }
@@ -707,14 +736,28 @@ function shift(n){
 
 function deleteFan(n, list, buttonPressed = false){
     if (buttonPressed){
-        data.numFans--
+        let btn = document.getElementById('deleteButton')
+        btn.innerHTML = 'Really delete?'
+        btn.style.backgroundColor = 'red'
+        if (list == data.currentFans){
+            list = 'data.currentFans'
+        } else {
+            list = 'data.handHolding'
+        }
+        btn.setAttribute('onclick', 'confirmDeletion('+n+','+list+')')
+        return
     }
     //console.log(list)
     //console.log(n)
     let index = searchID(list, n)
     list[index[0]].splice(index[1],1)
-    clearSelect()
     game.onLoad()
+}
+
+function confirmDeletion(n, list){
+    data.numFans--
+    removeSelectBox()
+    deleteFan(n,list)
 }
 
 function makeHandholdEntry(fan, rowNum, slotNum){
@@ -841,7 +884,8 @@ function holdHands(rowNum, firstID, secondID){
     secondEntry.removeAttribute('onclick')
 
     document.getElementById('hr'+rowNum+'b').innerHTML = ""
-    
+    document.getElementById('select').style.display = 'none'
+
     data.numFans--
     game.update()
     holding(firstID, secondID)

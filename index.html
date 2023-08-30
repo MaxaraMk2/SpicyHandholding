@@ -111,13 +111,19 @@
 </div> 
 
 <div id='select'>
-    <p style="display:inline-flex">Selected Fan:</p> 
-    <p id="selectData" style="display: inline-table;white-space:pre;width:150px;height:150px;text-align:center;border:black solid 1px;padding:10px">None</p>
-    <div>
-        <button id="fansButton" onclick="shift()" style="display:none;">Fanclub</button>
-        <button id="handButton" onclick="shift()" style="display:none">Handholding</button>
-        <button id="deleteButton" style="display:none">Delete</button>
+    <span id='closeSelect' onclick="removeSelectBox()">&times;</span>
+    <p id="selectData" style="display: inline-table;white-space:pre;width:150px;height:150px;text-align:center;border:black solid 1px;padding:10px;margin-left: 10px;margin-right:10px;position: relative; width:30%"></p>
+    <div id='selectDataText' style="display:inline-block;vertical-align: top;text-align: center;position: relative; width: 45%;margin: 10px">
+
+
+
+        <div style="display:inline">
+            <button class='tabButton' id="fansButton" onclick="shift()" style="width:110px;display:none;">Fanclub</button>
+            <button class='tabButton' id="handButton" onclick="shift()" style="width:110px;display:none">Handholding</button>
+            <button class='tabButton' id="deleteButton" style="width:110px;display:none">Delete</button>
+        </div>
     </div>
+ 
 </div>
 
 <div id="shopTab">

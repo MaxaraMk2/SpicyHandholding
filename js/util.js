@@ -57,14 +57,14 @@ function deleteSave(){
 function appear(list=[]){
     for (i=0;i<list.length;i++){
         //console.log(i)
-        document.getElementById(list[i]).setAttribute('style', 'display:inline-flex')
+        document.getElementById(list[i]).style.display = 'inline'
     }
 }
 
 function disappear(list=[]){
     for (i=0;i<list.length;i++){
         //console.log(i)
-        document.getElementById(list[i]).setAttribute('style', 'display:none')
+        document.getElementById(list[i]).style.display = 'none'
     }
 }
 
@@ -99,6 +99,12 @@ function findButtonIndex(list=[], target){
 function clearSelect(){
     document.getElementById('selectData').innerHTML = 'None'
     disappear(['handButton','deleteButton','fansButton'])
+}
+
+function removeSelectBox(){
+    let elem = document.getElementById('select')
+    elem.style.animation = 'bringDownSelect 0.3s forwards'
+    //elem.style.display = 'none'
 }
 
 function sleep(ms) {
@@ -153,11 +159,17 @@ function disableDays(dayNum, name){
 
 
 var numParts = 3    //number of separate sprite parts to combine
-function createSprite(id, indexList){
+function createSprite(id, indexList, small = true){
     let canvas = document.getElementById(id)
     let ctx = canvas.getContext('2d')
     ctx.imageSmoothingEnabled = false
     ctx.clearRect(0,0,canvas.width,canvas.height);
+
+    let spriteSize = 50
+
+    if (!small){
+        spriteSize = 175
+    }
 
     let n = 0
     for (let i=0;i<numParts;i++){
