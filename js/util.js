@@ -101,10 +101,19 @@ function clearSelect(){
     disappear(['handButton','deleteButton','fansButton'])
 }
 
+function unhighlightSelectedFan(){
+    elem = document.getElementsByClassName('selectedFan')
+    if (elem.length > 0){
+        elem[0].classList.remove('selectedFan')
+    }
+    temp.selectedFan = ''
+}
+
 function removeSelectBox(){
     let elem = document.getElementById('select')
     elem.style.animation = 'bringDownSelect 0.3s forwards'
-    //elem.style.display = 'none'
+
+    unhighlightSelectedFan()
 }
 
 function sleep(ms) {

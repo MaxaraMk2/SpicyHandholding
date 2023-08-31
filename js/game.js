@@ -42,7 +42,8 @@ data = {
 }
 
 temp = {
-    updateName: ''
+    updateName: '',
+    selectedFan: ''
 }
 
 game = {
@@ -141,18 +142,22 @@ function switchTo(targetTab){
         if (tabList[i] == targetTab){
             tab.style.display = 'block'
             document.getElementById(tabList[i]+'Button').className = 'activeTabButton'
+            document.getElementById(tabList[i]+'Button').setAttribute('disabled', true)
         } else {
             tab.style.display = 'none'
             document.getElementById(tabList[i]+'Button').className = 'tabButton'
+            document.getElementById(tabList[i]+'Button').removeAttribute('disabled')
             if (targetTab !== 'fansTab' || targetTab !== 'handTab'){
                 document.getElementById('select').style.display = 'none'
             }
+
         }
     }
     document.getElementById('maxLoveDesc').style.animation = ''
     document.getElementById('maxLoyaltyDesc').style.animation = ''
     document.getElementById('maxBudgetDesc').style.animation = ''
     document.getElementById('select').style.animation = ''
+    unhighlightSelectedFan()
 }
 
 
@@ -538,12 +543,17 @@ function addFanRow(){
 
 function makeFanEntry(fan, rowNum, slotNum){
     //console.log("fan entry: "+rowNum+','+slotNum)
-    let insert = document.getElementById('fr'+rowNum+'s'+slotNum)
+    let insertID = 'fr'+rowNum+'s'+slotNum
+    let insert = document.getElementById(insertID)
 
+    if (insertID == temp.selectedFan){
+        insert.classList.add('selectedFan')
+    }
     insert.setAttribute('style','white-space:pre;vertical-align:top;text-align:center')
     insert.setAttribute('onclick','select('+fan.id+')')
     insert.setAttribute('width','175px')
     insert.setAttribute('height','175px')
+    
  
     let printName = fan.name
     if (printName.length > 10){
@@ -609,6 +619,8 @@ function select(n){
     if (location !== undefined){
         let fan = data.currentFans[location[0]][location[1]]
         console.log(fan)
+        temp.selectedFan = 'fr'+(location[0]+1)+'s'+(location[1]+1)
+
         document.getElementById('selectData').innerHTML = ''
         if (document.getElementById('descText') !== null){
             document.getElementById('descText').remove()
@@ -646,6 +658,8 @@ function select(n){
         let location = searchID(data.handHolding, n)
         let fan = data.handHolding[location[0]][location[1]]
         console.log(fan)
+        temp.selectedFan = 'hr'+(location[0]+1)+'s'+(location[1]+1)
+
         document.getElementById('selectData').innerHTML = ''
         if (document.getElementById('descText') !== null){
             document.getElementById('descText').remove()
@@ -730,7 +744,8 @@ function shift(n){
             }
         }  
     }
-    document.getElementById('select').style.display = 'none'
+    //document.getElementById('select').style.display = 'none'
+    removeSelectBox()
     game.onLoad()
 }
 
@@ -762,7 +777,12 @@ function confirmDeletion(n, list){
 
 function makeHandholdEntry(fan, rowNum, slotNum){
     //console.log('hand entry: '+rowNum+','+slotNum)
-    let insert = document.getElementById('hr'+rowNum+'s'+slotNum)
+    let insertID = 'hr'+rowNum+'s'+slotNum
+    let insert = document.getElementById(insertID)
+
+    if (insertID == temp.selectedFan){
+        insert.classList.add('selectedFan')
+    }
 
     insert.setAttribute('style','white-space:pre;vertical-align:top;text-align:center')
     if (fan.inProgress != true){
@@ -885,6 +905,7 @@ function holdHands(rowNum, firstID, secondID){
 
     document.getElementById('hr'+rowNum+'b').innerHTML = ""
     document.getElementById('select').style.display = 'none'
+    unhighlightSelectedFan()
 
     data.numFans--
     game.update()
