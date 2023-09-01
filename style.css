@@ -52,10 +52,18 @@ body {
     background-color: grey;
 }
 
+.studioLabel {
+    vertical-align: bottom;
+    height: 20px;
+    text-align: center;
+    background-color: darkblue;
+    color:white
+}
+
 #select{
     display:none;
     position: fixed; 
-    width: 500px;
+    width: 800px;
     bottom: 5px;
     left: 50%;
     transform: translate(-50%);
@@ -85,9 +93,33 @@ body {
     to {bottom: -500px}
 }
 
-@keyframes sendToChatroom{
-    from {bottom: 5px; left:50%; transform: translate(-50%);}
-    to {}
+@keyframes growSchedule {
+    from {height: 0px}
+    to {height: max-content}
+}
+
+@keyframes shrinkSchedule {
+    from {height: max-content;}
+    to {height: 0px;}
+}
+
+@keyframes slideDownScheduleButtons{
+    from {transform: translateY(-100vh);}
+    to {transform: translateY(0);}
+}
+
+@keyframes slideUpScheduleButtons {
+    from {transform: translateY(0);}
+    to {transform: translateY(-100vh)}
+}
+
+#closeSchedule{
+    color: gray;
+    cursor:pointer
+}
+
+#closeSchedule:hover{
+    color: red
 }
 
 #closeSelect {

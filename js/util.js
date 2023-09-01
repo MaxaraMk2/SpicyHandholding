@@ -78,7 +78,64 @@ function searchID(list=[], target){
     }
 }
 
+function makeStudioDayLabels(id){
+    if (document.getElementById(id+'Labels') === null){
+        let labels = document.createElement('tr')
+        labels.id = id+'Labels'
+        if (localStorage.darkmode){
+            labels.classList.add('darkTable')
+            labels.classList.remove('lightTable')
+        } else {
+            labels.classList.add('lightTable')
+            labels.classList.remove('darkTable')
+        }
+        labels.classList.add('studioLabel')
 
+
+        for (let i=0 ;i<7 ; i++){
+            let entry = document.createElement('th')
+            entry.style.width = '80px'
+            switch(i){
+                case 0:
+                    entry.innerHTML = 'Monday'
+                    break
+                case 1:
+                    entry.innerHTML = 'Tuesday'
+                    break
+                case 2:
+                    entry.innerHTML = 'Wednesday'
+                    break
+                case 3:
+                    entry.innerHTML = 'Thursday'
+                    break
+                case 4:
+                    entry.innerHTML = 'Friday'
+                    break
+                case 5:
+                    entry.innerHTML = 'Saturday'
+                    break
+                case 6:
+                    entry.innerHTML = 'Sunday'
+                    break
+                default:
+                    console.log('studio day label error')
+                    break
+            }
+            //console.log(entry)
+            labels.append(entry)
+        }
+        
+        document.getElementById(id).append(labels)
+    }
+}
+
+function removeScheduleButtons(){
+    document.getElementById('scheduleButtons1').style.animation = 'slideUpScheduleButtons 0.3s forwards'
+    document.getElementById('scheduleButtons2').style.animation = 'slideUpScheduleButtons 0.3s forwards'
+    document.getElementById('currentStreamer').style.display = 'none'
+    document.getElementById('closeSchedule').style.display = 'none'
+    document.getElementById('buttonBox').style.animation = 'shrinkSchedule 100ms ease-in forwards'
+}
 
 function searchButton(list=[], target){
     for (let i=0;i<list.length;i++){
@@ -206,14 +263,16 @@ function switchDarkModeClasses(){
         document.body.classList.add('darkMode')
         let list = document.getElementsByClassName('lightTable')
         while (list.length > 0){
-            list[0].className = 'darkTable'
+            list[0].classList.add('darkTable')
+            list[0].classList.remove('lightTable')
         }
     } else {
         document.getElementById('darkLightButton').innerHTML = 'DARK MODE'
         document.body.classList.remove('darkMode')
         let list = document.getElementsByClassName('darkTable')
         while (list.length > 0){
-            list[0].className = 'lightTable'
+            list[0].classList.add('lightTable')
+            list[0].classList.remove('darkTable')
         }
     }
 }

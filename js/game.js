@@ -112,8 +112,11 @@ game = {
         document.getElementById('fansData').innerHTML = ""
         document.getElementById('handData1').innerHTML = ""
         document.getElementById('handData2').innerHTML = ""
-        //console.log(data.currentFans)
-        //console.log('loading..')
+        document.getElementById('scheduleButtons1').innerHTML = ''
+        document.getElementById('scheduleButtons2').innerHTML = ''
+        document.getElementById('week1').innerHTML = ''
+        document.getElementById('week2').innerHTML = ''
+
 
         addFanRow()
         addHandholdRow()
@@ -157,6 +160,9 @@ function switchTo(targetTab){
     document.getElementById('maxLoyaltyDesc').style.animation = ''
     document.getElementById('maxBudgetDesc').style.animation = ''
     document.getElementById('select').style.animation = ''
+    document.getElementById('scheduleButtons1').style.animation = ''
+    document.getElementById('scheduleButtons2').style.animation = ''
+    document.getElementById('allScheduleButtons').style.display = 'none'
     unhighlightSelectedFan()
 }
 
@@ -256,8 +262,10 @@ function addStudioRow(){
             if ((i+1) % 2 == 0){
                 table = document.getElementById('week2')
                 table.style.display = ''
+                makeStudioDayLabels('week2')
             } else {
                 table = document.getElementById('week1')
+                makeStudioDayLabels('week1')
             }
             let newRow = document.createElement('tr')
             newRow.setAttribute('id', 'studio'+(i+1))
@@ -387,6 +395,9 @@ function addStreamer(name){
 }
 
 function assign(name){
+    document.getElementById('allScheduleButtons').style.display = 'block'
+    document.getElementById('currentStreamer').style.display = 'inline'
+    document.getElementById('closeSchedule').style.display = 'inline'
     if (name == ""){
         return
     }
@@ -405,7 +416,7 @@ function assign(name){
                 button.removeAttribute('disabled')
             }
         }
-        document.getElementById('currentStreamer').innerHTML = 'Assigning for '+name+": "
+        document.getElementById('currentStreamer').innerHTML = 'Assigning for '+name
 
         if(document.getElementById('sLabel'+(i+1)) === null){
             let label = document.createElement('span')
@@ -419,7 +430,9 @@ function assign(name){
         }
 
     }
-
+    document.getElementById('scheduleButtons1').style.animation = 'slideDownScheduleButtons 0.3s'
+    document.getElementById('scheduleButtons2').style.animation = 'slideDownScheduleButtons 0.3s'
+    document.getElementById('buttonBox').style.animation = 'growSchedule 20ms ease-in-out forwards'
 }
 
 function addToSchedule(name, studio, dayNum){
@@ -609,8 +622,59 @@ function organiseFans(){
     }
 }
 
+function makeSelectBox(fan){
+    document.getElementById('selectData').innerHTML = ''
+        if (document.getElementById('descText') !== null){
+            document.getElementById('descText').remove()
+        }
 
-//TODO: animate sending to chatroom/fanclub
+        let newDiv = document.createElement('div')
+        newDiv.id = 'descText'
+        newDiv.style.height = '175px'
+        newDiv.style.whiteSpace = 'pre'
+        newDiv.style.textAlign = 'center'
+        newDiv.style.fontSize = '20px'
+
+        for (let i=0;i<5;i++){
+            let descLine = document.createElement('p')
+            descLine.style.marginBottom = '5px'
+            descLine.style.marginTop = '5px'
+            switch (i){
+                case 0:
+                    descLine.innerHTML = fan.name
+                    descLine.style.height = '2.5em'
+                    descLine.style.whiteSpace = 'pre-wrap'
+                    descLine.style.wordWrap = 'break-word'
+                    descLine.style.fontWeight = 'bold'
+                    break
+                case 1:
+                    descLine.innerHTML = 'Love: '+fan.love.toFixed(2)
+                    break
+                case 2:
+                    descLine.innerHTML = 'Loyalty: '+fan.loyalty.toFixed(2)
+                    break
+                case 3:
+                    descLine.innerHTML = 'Budget: '+fan.money.toFixed(2)
+                    break
+                case 4:
+                    descLine.innerHTML = 'Oshis: '+fan.oshi.length
+                    break
+                default:
+                    console.log('fan description error')
+                    break
+            }
+            newDiv.append(descLine)
+        }
+
+        document.getElementById('selectDataText').prepend(newDiv)
+
+        let cnv = document.createElement('canvas')
+        cnv.setAttribute('style','width:175px;height:175px')
+        cnv.id = 'selectDataImg'
+        document.getElementById('selectData').prepend(cnv)
+        createSprite(cnv.id, fan.oshiIndex, false)
+}
+
 function select(n){
     document.getElementById('select').style.display = 'block'
     document.getElementById('select').style.animation = ''
@@ -621,24 +685,7 @@ function select(n){
         console.log(fan)
         temp.selectedFan = 'fr'+(location[0]+1)+'s'+(location[1]+1)
 
-        document.getElementById('selectData').innerHTML = ''
-        if (document.getElementById('descText') !== null){
-            document.getElementById('descText').remove()
-        }
-
-        let newDiv = document.createElement('div')
-        newDiv.id = 'descText'
-        newDiv.innerHTML =  "\nType: "
-            +fan.name+"\nLove: "+fan.love.toFixed(2)+"\nLoyalty: "+fan.loyalty.toFixed(2)+"\nBudget: "
-            +fan.money.toFixed(2)+"\nOshis: "+fan.oshi.length+'\n'
-        newDiv.style.height = '175px'
-        document.getElementById('selectDataText').prepend(newDiv)
-
-        let cnv = document.createElement('canvas')
-        cnv.setAttribute('style','width:175px;height:175px')
-        cnv.id = 'selectDataImg'
-        document.getElementById('selectData').prepend(cnv)
-        createSprite(cnv.id, fan.oshiIndex, false)
+        makeSelectBox(fan)
 
         let fullRows = checkFull(data.handHolding)
         if (fullRows < data.handSlots){  
@@ -660,24 +707,7 @@ function select(n){
         console.log(fan)
         temp.selectedFan = 'hr'+(location[0]+1)+'s'+(location[1]+1)
 
-        document.getElementById('selectData').innerHTML = ''
-        if (document.getElementById('descText') !== null){
-            document.getElementById('descText').remove()
-        }
-
-        let newDiv = document.createElement('div')
-        newDiv.id = 'descText'
-        newDiv.innerHTML =  "\nType: "
-            +fan.name+"\nLove: "+fan.love.toFixed(2)+"\nLoyalty: "+fan.loyalty.toFixed(2)+"\nBudget: "
-            +fan.money.toFixed(2)+"\nOshis: "+fan.oshi.length+'\n'
-        newDiv.style.height = '175px'
-        document.getElementById('selectDataText').prepend(newDiv)
-
-        let cnv = document.createElement('canvas')
-        cnv.setAttribute('style','width:175px;height:175px')
-        cnv.id = 'selectDataImg'
-        document.getElementById('selectData').prepend(cnv)
-        createSprite(cnv.id, fan.oshiIndex, false)
+        makeSelectBox(fan)
         
         let fullRows = checkFull(data.currentFans)
         if (fullRows < data.fanSlots){
