@@ -89,9 +89,10 @@ game = {
         } else {
             data.currentDay = 0
         }
+        
     },
     update: function (){
-        document.getElementById('fundsValue').innerHTML = "Funds: $"+data.funds.toFixed(2)
+        document.getElementById('fundsValue').innerHTML = "Funds: $"+formatMoney(data.funds)
         
         if (data.currentFans.length < data.fanSlots){
             data.currentFans.push([])
@@ -102,7 +103,7 @@ game = {
         if (data.numFans > 0){
             data.costOfFan = 2**data.numFans
         }
-        document.getElementById('newFanButton').innerHTML = "NEW FAN ($"+data.costOfFan.toFixed(2)+")"
+        document.getElementById('newFanButton').innerHTML = "NEW FAN ($"+formatMoney(data.costOfFan)+")"
 
         
     },
@@ -164,24 +165,24 @@ function switchTo(targetTab){
     document.getElementById('scheduleButtons2').style.animation = ''
     document.getElementById('allScheduleButtons').style.display = 'none'
     unhighlightSelectedFan()
-}
+}   
 
 
 function setInitialCost(){
     // update buttons in beginning
-    document.getElementById('newFanButton').innerHTML = "NEW FAN ($"+data.costOfFan+")"
+    document.getElementById('newFanButton').innerHTML = "NEW FAN ($"+formatMoney(data.costOfFan)+")"
     if (data.debutList.length > 0){
-        document.getElementById('debutButton').innerHTML = "NEW DEBUT ($"+data.costOfStreamer+")"
+        document.getElementById('debutButton').innerHTML = "NEW DEBUT ($"+formatMoney(data.costOfStreamer)+")"
     } else {
         document.getElementById('debutButton').innerHTML = "NEW DEBUT (FREE)"
     }
-    document.getElementById('upgradeFanclubButton').innerHTML = "Upgrade Fanclub ($"+data.costOfFanclub+")"
-    document.getElementById('upgradeChatroomButton').innerHTML = "Upgrade Chatroom ($"+data.costOfChatroom+")"
-    document.getElementById('upgradeStudioButton').innerHTML = "Upgrade Studio ($"+data.costOfStudio+")"
+    document.getElementById('upgradeFanclubButton').innerHTML = "Upgrade Fanclub ($"+formatMoney(data.costOfFanclub)+")"
+    document.getElementById('upgradeChatroomButton').innerHTML = "Upgrade Chatroom ($"+formatMoney(data.costOfChatroom)+")"
+    document.getElementById('upgradeStudioButton').innerHTML = "Upgrade Studio ($"+formatMoney(data.costOfStudio)+")"
 
     document.getElementById('maxLoveDesc').innerHTML = "Maximum LOVE: "+data.maxLove
     document.getElementById('maxLoyaltyDesc').innerHTML = "Maximum LOYALTY: "+data.maxLoyalty
-    document.getElementById('maxBudgetDesc').innerHTML = "Maximum BUDGET: $"+data.maxMoney
+    document.getElementById('maxBudgetDesc').innerHTML = "Maximum BUDGET: $"+formatMoney(data.maxMoney)
 }
 
 var purchaseButtons = ['newFanButton', 'debutButton', 'upgradeFanclubButton', 'upgradeChatroomButton', 'upgradeStudioButton']
@@ -222,7 +223,7 @@ function checkPurchasables(){
                 }
                 break
             case 4:
-                if (data.funds >= data.costOfStudio) {
+                if (data.funds >= data.costOfStudio && data.studioSlots < data.oshiName.length) {
                     button.removeAttribute('disabled')
                 }else {
                     button.setAttribute('disabled', true)
@@ -353,27 +354,38 @@ function printSchedule(){
     }
 }
 
+function getRandomStreamer(){
+    let index = randIntRange(0, data.oshiName.length-1)
+    if (!data.debutList.includes(data.oshiName[index])){
+        data.debutList.push(data.oshiName[index])
+        addStreamer(data.oshiName[index])
+    } else {
+        getRandomStreamer()
+    }
+}
+
 function debutStreamer(){
+    let button = document.getElementById('debutButton')
+    //console.log(button)
     if (data.funds >= data.costOfStreamer){
-        let index = randIntRange(0, data.oshiName.length-1)
         if (data.debutList.length < data.oshiName.length){
-            if (!data.debutList.includes(data.oshiName[index])){
-                data.debutList.push(data.oshiName[index])
-                addStreamer(data.oshiName[index])
-            } else {
-                debutStreamer()
-            }
+            getRandomStreamer()
         } else {
-            document.getElementById('debutButton').setAttribute('disabled','true')
+            button.setAttribute('disabled','true')
         }
         data.funds -= data.costOfStreamer
-        game.update()
+        //game.update()
+
         if (data.costOfStreamer == 0){
             data.costOfStreamer = 1000
         } else {
-            data.costOfStreamer *= 2
+            data.costOfStreamer = data.costOfStreamer*2
+            //console.log(data.costOfStreamer)
         }
-        document.getElementById('debutButton').innerHTML = 'NEW DEBUT ($'+data.costOfStreamer+')'
+        button.innerHTML = 'NEW DEBUT ($'+formatMoney(data.costOfStreamer)+')'
+        if (data.debutList.length == data.oshiName.length){
+            button.innerHTML = 'All talents hired!'
+        }
     }
     checkPurchasables()
 }
@@ -1183,7 +1195,7 @@ function upgrade(item){
                 data.funds -= data.costOfFanclub
                 data.fanSlots++
                 data.costOfFanclub *= 10
-                document.getElementById('upgradeFanclubButton').innerHTML = "Upgrade Fanclub ($"+data.costOfFanclub+")"
+                document.getElementById('upgradeFanclubButton').innerHTML = "Upgrade Fanclub\n($"+formatMoney(data.costOfFanclub)+")"
             }
             break
         case 'handSlots':
@@ -1191,17 +1203,22 @@ function upgrade(item){
                 data.funds -= data.costOfChatroom
                 data.handSlots++
                 data.costOfChatroom *= 5
-                document.getElementById('upgradeChatroomButton').innerHTML = "Upgrade Chatroom ($"+data.costOfChatroom+")"
+                document.getElementById('upgradeChatroomButton').innerHTML = "Upgrade Chatroom\n($"+formatMoney(data.costOfChatroom)+")"
             }
             break
         case 'studioSlots':
+            let button = document.getElementById('upgradeStudioButton')
             if (data.funds >= data.costOfStudio && data.studioSlots < data.oshiName.length){
                 data.funds -= data.costOfStudio
                 data.studioSlots++
                 data.costOfStudio *= 10
                 data.streamSchedule.push(['-','-','-','-','-','-','-']) 
-                document.getElementById('upgradeStudioButton').innerHTML = "Upgrade Studio ($"+data.costOfStudio+")"
-            }         
+                button.innerHTML = "Upgrade Studio\n($"+formatMoney(data.costOfStudio)+")"
+            }
+            if (data.studioSlots == data.oshiName.length){
+                button.innerHTML = 'All Studios Bought!'
+                button.setAttribute('disabled', true)
+            }
             break
         default:
             console.log('upgrade error oh no')

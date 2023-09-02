@@ -129,6 +129,6 @@ body {
 }
 
 #closeSelect:hover{
-    color: black;
+    color: red;
     cursor: pointer;
 }

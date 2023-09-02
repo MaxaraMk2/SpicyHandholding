@@ -187,6 +187,35 @@ function formatTime(seconds){
     }
 }
 
+function formatMoney(n){
+    let string = n.toFixed(2).toString()
+    let len = string.length
+    //console.log(string)
+
+    let formatString = ''
+    let loop = 0
+    let numDigits = 0
+    if (len < 13){
+        for (let i=len-1;i>=0;i--){
+            formatString = string[i].concat(formatString)
+            if (loop >= 3){
+                numDigits++
+                if (numDigits == 3){
+                    formatString = ','.concat(formatString)
+                    numDigits = 0
+                }
+            }
+            loop++
+        }
+        if (formatString[0] == ','){
+            formatString = formatString.slice(1)
+        }
+    } else {
+        formatString = n.toExponential(2).toString()
+    }
+    return formatString
+}
+
 function checkFull(list){
     let fullRows = 0
     for (let i=0;i<list.length;i++){
