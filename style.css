@@ -1,0 +1,134 @@
+body {
+    background-color: white;
+    color: black
+}
+
+.darkMode{
+    background-color: #121212;
+    color: white;
+}
+
+.lightTable{
+    border: solid black 1px;
+    background-color: lightgrey;
+}
+
+.darkTable{
+    border: solid white 1px;
+    background-color: #404040;
+}
+
+#tabBar {
+    background-color: darkblue;
+    height: 50px;
+}
+
+.tabButton{
+    color: white;
+    background-color: darkblue;
+    width: 80px;
+    height: 50px;
+    text-align: center;
+    vertical-align: middle;
+    border: none;
+}
+
+.activeTabButton{
+    color: white;
+    background-color: cornflowerblue;
+    width: 80px;
+    height: 50px;
+    text-align: center;
+    vertical-align: middle;
+    border: none;
+}
+
+.tabButton:hover{
+    background-color: cornflowerblue;
+    cursor: pointer;
+}
+
+.tabButton:disabled{
+    background-color: grey;
+}
+
+.studioLabel {
+    vertical-align: bottom;
+    height: 20px;
+    text-align: center;
+    background-color: darkblue;
+    color:white
+}
+
+#select{
+    display:none;
+    position: fixed; 
+    width: 800px;
+    bottom: 5px;
+    left: 50%;
+    transform: translate(-50%);
+}
+
+.selectedFan{
+    background-color: green;
+}
+
+@keyframes maxUpdateLight {
+    from {color: lightgreen;}
+    to {color: black}
+}
+
+@keyframes maxUpdateDark {
+    from {color: lightgreen}
+    to {color:white}
+}
+
+@keyframes bringUpSelect {
+    from {bottom: -500px}
+    to {bottom: 5px}
+}
+
+@keyframes bringDownSelect {
+    from {bottom: 5px}
+    to {bottom: -500px}
+}
+
+@keyframes growSchedule {
+    from {height: 0px}
+    to {height: max-content}
+}
+
+@keyframes shrinkSchedule {
+    from {height: max-content;}
+    to {height: 0px;}
+}
+
+@keyframes slideDownScheduleButtons{
+    from {transform: translateY(-100vh);}
+    to {transform: translateY(0);}
+}
+
+@keyframes slideUpScheduleButtons {
+    from {transform: translateY(0);}
+    to {transform: translateY(-100vh)}
+}
+
+#closeSchedule{
+    color: gray;
+    cursor:pointer
+}
+
+#closeSchedule:hover{
+    color: red
+}
+
+#closeSelect {
+    float:right;
+    font-size: 32px;
+    transform: translate(-5px,-5px);
+}
+
+#closeSelect:hover{
+    color: red;
+    cursor: pointer;
+}

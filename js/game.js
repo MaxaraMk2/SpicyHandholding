@@ -1,4 +1,5 @@
 data = {
+    lightMode: true,
     time: {
         saveDate: 0,
         currentDate:0,
@@ -41,7 +42,8 @@ data = {
 }
 
 temp = {
-    updateName: ''
+    updateName: '',
+    selectedFan: ''
 }
 
 game = {
@@ -54,6 +56,8 @@ game = {
         addStudioRow()
         printSchedule()
         setInitialCost()
+        switchTo('streamTab')
+        switchDarkModeClasses()
         game.tick()
     },
     tick: function(){
@@ -85,9 +89,10 @@ game = {
         } else {
             data.currentDay = 0
         }
+        
     },
     update: function (){
-        document.getElementById('fundsValue').innerHTML = "$"+data.funds.toFixed(2)
+        document.getElementById('fundsValue').innerHTML = "Funds: $"+formatMoney(data.funds)
         
         if (data.currentFans.length < data.fanSlots){
             data.currentFans.push([])
@@ -98,15 +103,21 @@ game = {
         if (data.numFans > 0){
             data.costOfFan = 2**data.numFans
         }
-        document.getElementById('newFanButton').innerHTML = "NEW FAN ($"+data.costOfFan.toFixed(2)+")"
+        document.getElementById('newFanButton').innerHTML = "NEW FAN ($"+formatMoney(data.costOfFan)+")"
+
+        
     },
     onLoad: function(){
         //resetTables()
         document.getElementById('streamlist').innerHTML = ""
         document.getElementById('fansData').innerHTML = ""
-        document.getElementById('handData').innerHTML = ""
-        //console.log(data.currentFans)
-        //console.log('loading..')
+        document.getElementById('handData1').innerHTML = ""
+        document.getElementById('handData2').innerHTML = ""
+        document.getElementById('scheduleButtons1').innerHTML = ''
+        document.getElementById('scheduleButtons2').innerHTML = ''
+        document.getElementById('week1').innerHTML = ''
+        document.getElementById('week2').innerHTML = ''
+
 
         addFanRow()
         addHandholdRow()
@@ -128,17 +139,50 @@ game = {
     }
 }
 
+var tabList = ['streamTab', 'fansTab', 'handTab', 'shopTab', 'optionsTab']
+function switchTo(targetTab){
+    for (let i=0; i<tabList.length;i++){
+        let tab = document.getElementById(tabList[i])
+        if (tabList[i] == targetTab){
+            tab.style.display = 'block'
+            document.getElementById(tabList[i]+'Button').className = 'activeTabButton'
+            document.getElementById(tabList[i]+'Button').setAttribute('disabled', true)
+        } else {
+            tab.style.display = 'none'
+            document.getElementById(tabList[i]+'Button').className = 'tabButton'
+            document.getElementById(tabList[i]+'Button').removeAttribute('disabled')
+            if (targetTab !== 'fansTab' || targetTab !== 'handTab'){
+                document.getElementById('select').style.display = 'none'
+            }
+
+        }
+    }
+    document.getElementById('maxLoveDesc').style.animation = ''
+    document.getElementById('maxLoyaltyDesc').style.animation = ''
+    document.getElementById('maxBudgetDesc').style.animation = ''
+    document.getElementById('select').style.animation = ''
+    document.getElementById('scheduleButtons1').style.animation = ''
+    document.getElementById('scheduleButtons2').style.animation = ''
+    document.getElementById('allScheduleButtons').style.display = 'none'
+    unhighlightSelectedFan()
+}   
+
+
 function setInitialCost(){
     // update buttons in beginning
-    document.getElementById('newFanButton').innerHTML = "NEW FAN ($"+data.costOfFan+")"
+    document.getElementById('newFanButton').innerHTML = "NEW FAN ($"+formatMoney(data.costOfFan)+")"
     if (data.debutList.length > 0){
-        document.getElementById('debutButton').innerHTML = "NEW DEBUT ($"+data.costOfStreamer+")"
+        document.getElementById('debutButton').innerHTML = "NEW DEBUT ($"+formatMoney(data.costOfStreamer)+")"
     } else {
         document.getElementById('debutButton').innerHTML = "NEW DEBUT (FREE)"
     }
-    document.getElementById('upgradeFanclubButton').innerHTML = "Upgrade Fanclub ($"+data.costOfFanclub+")"
-    document.getElementById('upgradeChatroomButton').innerHTML = "Upgrade Chatroom ($"+data.costOfChatroom+")"
-    document.getElementById('upgradeStudioButton').innerHTML = "Upgrade Studio ($"+data.costOfStudio+")"
+    document.getElementById('upgradeFanclubButton').innerHTML = "Upgrade Fanclub ($"+formatMoney(data.costOfFanclub)+")"
+    document.getElementById('upgradeChatroomButton').innerHTML = "Upgrade Chatroom ($"+formatMoney(data.costOfChatroom)+")"
+    document.getElementById('upgradeStudioButton').innerHTML = "Upgrade Studio ($"+formatMoney(data.costOfStudio)+")"
+
+    document.getElementById('maxLoveDesc').innerHTML = "Maximum LOVE: "+data.maxLove
+    document.getElementById('maxLoyaltyDesc').innerHTML = "Maximum LOYALTY: "+data.maxLoyalty
+    document.getElementById('maxBudgetDesc').innerHTML = "Maximum BUDGET: $"+formatMoney(data.maxMoney)
 }
 
 var purchaseButtons = ['newFanButton', 'debutButton', 'upgradeFanclubButton', 'upgradeChatroomButton', 'upgradeStudioButton']
@@ -179,7 +223,7 @@ function checkPurchasables(){
                 }
                 break
             case 4:
-                if (data.funds >= data.costOfStudio) {
+                if (data.funds >= data.costOfStudio && data.studioSlots < data.oshiName.length) {
                     button.removeAttribute('disabled')
                 }else {
                     button.setAttribute('disabled', true)
@@ -198,11 +242,12 @@ function liveMarker(){
         if (data.streamSchedule[i][data.currentDay] != "-"){      
             let span = document.createElement('span')    
             span.innerHTML = "\nLIVE"
-            span.setAttribute('style','color:red')
+            span.setAttribute('style','color:red;vertical-align:bottom')
             document.getElementById('s'+(i+1)+'d'+(data.currentDay+1)).append(span)
             setTimeout((id, toRemove) => {try{document.getElementById(id).removeChild(toRemove)} catch {}}, 800, 's'+(i+1)+'d'+(data.currentDay+1), span)
         } else {
             let span = document.createElement('span')
+            span.setAttribute('style', 'vertical-align:bottom')
             span.innerHTML = "\nOFFLINE"
             document.getElementById('s'+(i+1)+'d'+(data.currentDay+1)).append(span)
             setTimeout((id, toRemove) => {try {document.getElementById(id).removeChild(toRemove)} catch {}}, 800, 's'+(i+1)+'d'+(data.currentDay+1), span)
@@ -214,14 +259,27 @@ function liveMarker(){
 function addStudioRow(){
     for (let i=0;i<data.studioSlots;i++){
         if(document.getElementById('studio'+(i+1)) === null){
-            let table = document.getElementById('week')
+            let table = ""
+            if ((i+1) % 2 == 0){
+                table = document.getElementById('week2')
+                table.style.display = ''
+                makeStudioDayLabels('week2')
+            } else {
+                table = document.getElementById('week1')
+                makeStudioDayLabels('week1')
+            }
             let newRow = document.createElement('tr')
             newRow.setAttribute('id', 'studio'+(i+1))
+            if (localStorage.darkmode){
+                newRow.className = 'darkTable'
+            } else {
+                newRow.className = 'lightTable'
+            }
 
             for (let j=0;j<7;j++){
                 let slot = document.createElement('td')
                 slot.setAttribute('id', 's'+(i+1)+'d'+(j+1))
-                slot.setAttribute('style', "vertical-align: top; height: 50px;text-align: center;white-space: pre;")
+                slot.setAttribute('style', "vertical-align: top; height: 75px;text-align: center;white-space: pre;")
                 newRow.append(slot)
             }
             table.append(newRow)
@@ -231,7 +289,12 @@ function addStudioRow(){
         }
 
         if (document.getElementById('sButton'+(i+1)) === null){
-            let table = document.getElementById('scheduleButtons')
+            let table = ""
+            if ((i+1) % 2 == 0){
+                table = document.getElementById('scheduleButtons2')
+            } else {
+                table = document.getElementById('scheduleButtons1')
+            }
             let newRow = document.createElement('tr')
             newRow.setAttribute('id', 'sButton'+(i+1))
 
@@ -277,32 +340,52 @@ function addStudioRow(){
 function printSchedule(){
     for (let i=0;i<data.studioSlots;i++){
         for (let j=0;j<7;j++){
-            document.getElementById('s'+(i+1)+'d'+(j+1)).innerHTML = data.streamSchedule[i][j]
+            let entry = document.getElementById('s'+(i+1)+'d'+(j+1))//.innerHTML = data.streamSchedule[i][j]
+            if (data.streamSchedule[i][j] !== '-'){
+                entry.innerHTML = ""
+                let pic = document.createElement('img')
+                pic.setAttribute('src', 'img/testminipic.png')
+                pic.setAttribute('style','height:50px')
+                entry.append(pic)
+            } else {
+                entry.innerHTML = data.streamSchedule[i][j]
+            }
         }
     }
 }
 
+function getRandomStreamer(){
+    let index = randIntRange(0, data.oshiName.length-1)
+    if (!data.debutList.includes(data.oshiName[index])){
+        data.debutList.push(data.oshiName[index])
+        addStreamer(data.oshiName[index])
+    } else {
+        getRandomStreamer()
+    }
+}
+
 function debutStreamer(){
+    let button = document.getElementById('debutButton')
+    //console.log(button)
     if (data.funds >= data.costOfStreamer){
-        let index = randIntRange(0, data.oshiName.length-1)
         if (data.debutList.length < data.oshiName.length){
-            if (!data.debutList.includes(data.oshiName[index])){
-                data.debutList.push(data.oshiName[index])
-                addStreamer(data.oshiName[index])
-            } else {
-                debutStreamer()
-            }
+            getRandomStreamer()
         } else {
-            document.getElementById('debutButton').setAttribute('disabled','true')
+            button.setAttribute('disabled','true')
         }
         data.funds -= data.costOfStreamer
-        game.update()
+        //game.update()
+
         if (data.costOfStreamer == 0){
             data.costOfStreamer = 1000
         } else {
-            data.costOfStreamer *= 2
+            data.costOfStreamer = data.costOfStreamer*2
+            //console.log(data.costOfStreamer)
         }
-        document.getElementById('debutButton').innerHTML = 'NEW DEBUT ($'+data.costOfStreamer+')'
+        button.innerHTML = 'NEW DEBUT ($'+formatMoney(data.costOfStreamer)+')'
+        if (data.debutList.length == data.oshiName.length){
+            button.innerHTML = 'All talents hired!'
+        }
     }
     checkPurchasables()
 }
@@ -310,18 +393,23 @@ function debutStreamer(){
 function addStreamer(name){
     if (data.funds >= data.costOfFan){
         document.getElementById('newFanButton').removeAttribute('disabled')
+        disableBuyIfFanclubFull()
     }
-    let newStream = document.createElement('td')
+    let newStream = document.createElement('img')
             newStream.innerHTML = name
             newStream.setAttribute('id', name)
+            newStream.setAttribute('src', 'img/testpic.png')
             newStream.setAttribute('style','white-space:pre;vertical-align:top;text-align:center')
             newStream.setAttribute('onclick','assign("'+name+'")')
-            newStream.setAttribute('width','50px')
-            newStream.setAttribute('height','20px')
+            newStream.setAttribute('width','100px')
+            //newStream.setAttribute('height','120px')
             document.getElementById('streamlist').append(newStream)
 }
 
 function assign(name){
+    document.getElementById('allScheduleButtons').style.display = 'block'
+    document.getElementById('currentStreamer').style.display = 'inline'
+    document.getElementById('closeSchedule').style.display = 'inline'
     if (name == ""){
         return
     }
@@ -331,25 +419,32 @@ function assign(name){
     for (let i=0;i<data.studioSlots;i++){
         for (let j=0;j<7;j++){
             let button = document.getElementById('s'+(i+1)+'b'+(j+1))
-            button.setAttribute('style','display:inline-flex')
+            button.setAttribute('style','display:inline;text-align:center;vertical-align:middle;width:50px')
             button.setAttribute('onclick','addToSchedule("'+name+'",'+i+','+j+')')
+            button.className = 'tabButton'
             if (data.streamSchedule[i][j] == name){
                 button.setAttribute('disabled', true)
             } else {
                 button.removeAttribute('disabled')
             }
         }
-        document.getElementById('currentStreamer').innerHTML = 'Assigning for '+name+": "
+        document.getElementById('currentStreamer').innerHTML = 'Assigning for '+name
 
         if(document.getElementById('sLabel'+(i+1)) === null){
             let label = document.createElement('span')
             label.id = 'sLabel'+(i+1)
-            label.innerHTML = 'Studio '+(i+1)+': '
+            if ((i+1)<10){
+                label.innerHTML = 'Studio 0'+(i+1)+': '
+            } else {
+                label.innerHTML = 'Studio '+(i+1)+': '
+            }
             document.getElementById('sButton'+(i+1)).prepend(label)
         }
 
     }
-
+    document.getElementById('scheduleButtons1').style.animation = 'slideDownScheduleButtons 0.3s'
+    document.getElementById('scheduleButtons2').style.animation = 'slideDownScheduleButtons 0.3s'
+    document.getElementById('buttonBox').style.animation = 'growSchedule 20ms ease-in-out forwards'
 }
 
 function addToSchedule(name, studio, dayNum){
@@ -377,12 +472,13 @@ function generateFan(){
     if (data.funds >= data.costOfFan){
         data.numFans++
         let oshiNum = randIntRange(0, data.debutList.length-1)
-        let name = data.fanName[data.oshiName.indexOf(data.debutList[oshiNum])]
+        let oshiIndex = data.oshiName.indexOf(data.debutList[oshiNum])
+        let name = data.fanName[oshiIndex]
         let love = randIntRange(1,10)
         let loyalty = randIntRange(1,10)
         let money = randIntRange (1,25)
-        let oshi =  [data.oshiName[data.oshiName.indexOf(data.debutList[oshiNum])]]
-        let newbie = new Fan(name,love,loyalty,money, oshi)
+        let oshi =  [data.oshiName[oshiIndex]]
+        let newbie = new Fan(name,love,loyalty,money, oshi, [oshiIndex])
 
         let startLength  = data.currentFans.length
         if (startLength < data.fanSlots){
@@ -454,7 +550,12 @@ function addFanRow(){
             for (let j=0;j<data.fanLimit;j++){
                 let slot = document.createElement('td')
                 slot.setAttribute('id', 'fr'+(i+1)+'s'+(j+1))
-                slot.setAttribute('style', 'width:150px;border:black solid 1px;height:150px')
+                slot.setAttribute('style', 'width:175px;height:175px')
+                if (localStorage.darkmode){
+                    slot.className = 'darkTable'
+                } else {
+                    slot.className = 'lightTable'
+                }
                 newRow.append(slot)
             }
             table.append(newRow)
@@ -467,18 +568,31 @@ function addFanRow(){
 
 function makeFanEntry(fan, rowNum, slotNum){
     //console.log("fan entry: "+rowNum+','+slotNum)
-    let insert = document.getElementById('fr'+rowNum+'s'+slotNum)
+    let insertID = 'fr'+rowNum+'s'+slotNum
+    let insert = document.getElementById(insertID)
 
-    insert.setAttribute('style','white-space:pre;vertical-align:top;border:black solid 1px;text-align:center')
+    if (insertID == temp.selectedFan){
+        insert.classList.add('selectedFan')
+    }
+    insert.setAttribute('style','white-space:pre;vertical-align:top;text-align:center')
     insert.setAttribute('onclick','select('+fan.id+')')
-    insert.setAttribute('width','150px')
-    insert.setAttribute('height','150px')
+    insert.setAttribute('width','175px')
+    insert.setAttribute('height','175px')
+    
+ 
     let printName = fan.name
     if (printName.length > 10){
         printName = printName.slice(0,8)
         printName = printName+'...'
     }
-    insert.innerHTML = "Type: "+printName+"\nLove: "+fan.love.toFixed(2)+"\nLoyalty: "+fan.loyalty.toFixed(2)+"\nBudget: "+fan.money.toFixed(2)+"\nOshis: "+fan.oshi.length+"\n"
+    insert.innerHTML = "\nType: "+printName+"\nLove: "+fan.love.toFixed(2)+"\nLoyalty: "+fan.loyalty.toFixed(2)+"\nBudget: "+fan.money.toFixed(2)+"\nOshis: "+fan.oshi.length+"\n"
+
+    let cnv = document.createElement('canvas')
+    cnv.setAttribute('style','width:50px;height:50px')
+    cnv.id = 'fr'+rowNum+'s'+slotNum+'img'
+    //console.log(cnv)
+    insert.prepend(cnv)
+    createSprite(cnv.id, fan.oshiIndex)
 }
 
 function printAllFans(){
@@ -520,14 +634,71 @@ function organiseFans(){
     }
 }
 
+function makeSelectBox(fan){
+    document.getElementById('selectData').innerHTML = ''
+        if (document.getElementById('descText') !== null){
+            document.getElementById('descText').remove()
+        }
 
+        let newDiv = document.createElement('div')
+        newDiv.id = 'descText'
+        newDiv.style.height = '175px'
+        newDiv.style.whiteSpace = 'pre'
+        newDiv.style.textAlign = 'center'
+        newDiv.style.fontSize = '20px'
+
+        for (let i=0;i<5;i++){
+            let descLine = document.createElement('p')
+            descLine.style.marginBottom = '5px'
+            descLine.style.marginTop = '5px'
+            switch (i){
+                case 0:
+                    descLine.innerHTML = fan.name
+                    descLine.style.height = '2.5em'
+                    descLine.style.whiteSpace = 'pre-wrap'
+                    descLine.style.wordWrap = 'break-word'
+                    descLine.style.fontWeight = 'bold'
+                    break
+                case 1:
+                    descLine.innerHTML = 'Love: '+fan.love.toFixed(2)
+                    break
+                case 2:
+                    descLine.innerHTML = 'Loyalty: '+fan.loyalty.toFixed(2)
+                    break
+                case 3:
+                    descLine.innerHTML = 'Budget: '+fan.money.toFixed(2)
+                    break
+                case 4:
+                    descLine.innerHTML = 'Oshis: '+fan.oshi.length
+                    break
+                default:
+                    console.log('fan description error')
+                    break
+            }
+            newDiv.append(descLine)
+        }
+
+        document.getElementById('selectDataText').prepend(newDiv)
+
+        let cnv = document.createElement('canvas')
+        cnv.setAttribute('style','width:175px;height:175px')
+        cnv.id = 'selectDataImg'
+        document.getElementById('selectData').prepend(cnv)
+        createSprite(cnv.id, fan.oshiIndex, false)
+}
 
 function select(n){
+    document.getElementById('select').style.display = 'block'
+    document.getElementById('select').style.animation = ''
+    document.getElementById('select').style.animation = 'bringUpSelect 0.3s'
     let location = searchID(data.currentFans, n)
     if (location !== undefined){
         let fan = data.currentFans[location[0]][location[1]]
         console.log(fan)
-        document.getElementById('selectData').innerHTML = ("Type: "+fan.name+"\nLove: "+fan.love.toFixed(2)+"\nLoyalty: "+fan.loyalty.toFixed(2)+"\nBudget: "+fan.money.toFixed(2)+"\nOshis: "+fan.oshi.length+'\n')
+        temp.selectedFan = 'fr'+(location[0]+1)+'s'+(location[1]+1)
+
+        makeSelectBox(fan)
+
         let fullRows = checkFull(data.handHolding)
         if (fullRows < data.handSlots){  
             document.getElementById('handButton').innerHTML = "Handholding"
@@ -538,13 +709,18 @@ function select(n){
             document.getElementById('handButton').innerHTML = "Chatroom Full!"
         }
         document.getElementById('deleteButton').setAttribute('onclick','deleteFan('+n+', data.currentFans, true)')
+        document.getElementById('deleteButton').innerHTML = 'Delete'
+        document.getElementById('deleteButton').style.backgroundColor = ''
         disappear(['fansButton'])
         appear(['handButton','deleteButton'])
     } else{
         let location = searchID(data.handHolding, n)
         let fan = data.handHolding[location[0]][location[1]]
         console.log(fan)
-        document.getElementById('selectData').innerHTML = ("Type: "+fan.name+"\nLove: "+fan.love.toFixed(2)+"\nLoyalty: "+fan.loyalty.toFixed(2)+"\nBudget: "+fan.money.toFixed(2)+"\nOshis: "+fan.oshi.length+'\n')
+        temp.selectedFan = 'hr'+(location[0]+1)+'s'+(location[1]+1)
+
+        makeSelectBox(fan)
+        
         let fullRows = checkFull(data.currentFans)
         if (fullRows < data.fanSlots){
             document.getElementById('fansButton').setAttribute('onclick','shift('+n+')')
@@ -555,6 +731,8 @@ function select(n){
             document.getElementById('fansButton').innerHTML = "Fanclub Full!"
         }
         document.getElementById('deleteButton').setAttribute('onclick','deleteFan('+n+', data.handHolding, true)')
+        document.getElementById('deleteButton').innerHTML = 'Delete'
+        document.getElementById('deleteButton').style.backgroundColor = ''
         disappear(['handButton'])
         appear(['fansButton','deleteButton'])
     }
@@ -608,41 +786,70 @@ function shift(n){
             }
         }  
     }
+    //document.getElementById('select').style.display = 'none'
+    removeSelectBox()
     game.onLoad()
 }
 
 function deleteFan(n, list, buttonPressed = false){
     if (buttonPressed){
-        data.numFans--
+        let btn = document.getElementById('deleteButton')
+        btn.innerHTML = 'Really delete?'
+        btn.style.backgroundColor = 'red'
+        if (list == data.currentFans){
+            list = 'data.currentFans'
+        } else {
+            list = 'data.handHolding'
+        }
+        btn.setAttribute('onclick', 'confirmDeletion('+n+','+list+')')
+        return
     }
     //console.log(list)
     //console.log(n)
     let index = searchID(list, n)
     list[index[0]].splice(index[1],1)
-    clearSelect()
     game.onLoad()
+}
+
+function confirmDeletion(n, list){
+    data.numFans--
+    removeSelectBox()
+    deleteFan(n,list)
 }
 
 function makeHandholdEntry(fan, rowNum, slotNum){
     //console.log('hand entry: '+rowNum+','+slotNum)
-    let insert = document.getElementById('hr'+rowNum+'s'+slotNum)
+    let insertID = 'hr'+rowNum+'s'+slotNum
+    let insert = document.getElementById(insertID)
 
-    insert.setAttribute('style','white-space:pre;vertical-align:top;border: black solid 1px;text-align:center')
+    if (insertID == temp.selectedFan){
+        insert.classList.add('selectedFan')
+    }
+
+    insert.setAttribute('style','white-space:pre;vertical-align:top;text-align:center')
     if (fan.inProgress != true){
         insert.setAttribute('onclick','select('+fan.id+')')
     }
-    insert.setAttribute('width','150px')
-    insert.setAttribute('height','150px')
+    insert.setAttribute('width','175px')
+    insert.setAttribute('height','175px')
     let printName = fan.name
     if (printName.length > 10){
         printName = printName.slice(0,8)
         printName = printName+'...'
     }
-    insert.innerHTML = "Type: "+printName+"\nLove: "+fan.love.toFixed(2)+"\nLoyalty: "+fan.loyalty.toFixed(2)+"\nBudget: "+fan.money.toFixed(2)+"\nOshis: "+fan.oshi.length+'\n'
+    insert.innerHTML = "\nType: "+printName+"\nLove: "+fan.love.toFixed(2)+"\nLoyalty: "+fan.loyalty.toFixed(2)+"\nBudget: "+fan.money.toFixed(2)+"\nOshis: "+fan.oshi.length+'\n'
+
+    let cnv = document.createElement('canvas')
+    cnv.setAttribute('style','width:50px;height:50px')
+    cnv.id = 'hr'+rowNum+'s'+slotNum+'img'
+    //console.log(cnv)
+    insert.prepend(cnv)
+    createSprite(cnv.id, fan.oshiIndex)
 }
 
 function printAllHandholding(){
-    document.getElementById('handData').innerHTML == ""
+    document.getElementById('handData1').innerHTML == ""
+    document.getElementById('handData2').innerHTML = ""
     for (let i=0; i<data.handHolding.length;i++){
         addHandholdRow()
         let row = document.getElementById('handRow'+(i+1))
@@ -665,7 +872,8 @@ function checkForButton(){
             let newButton = document.createElement('button')
             newButton.setAttribute('id', 'button'+(i+1))
             newButton.setAttribute('onclick','holdHands('+[(i+1), data.handHolding[i][0].id, data.handHolding[i][1].id]+')')
-            newButton.setAttribute('style', 'white-space:pre')
+            newButton.setAttribute('style', 'white-space:pre;width:100px')
+            newButton.className = 'tabButton'
             let fullRows = checkFull(data.currentFans)
             if (fullRows == data.fanSlots) { 
                 newButton.setAttribute('disabled', true)
@@ -689,20 +897,34 @@ function checkForButton(){
 function addHandholdRow(){
     for (let i=0;i<data.handSlots;i++){
         if(document.getElementById('handRow'+(i+1)) === null){
-            let table = document.getElementById('handData')
+            let table = ""
+            if ((i+1) % 2 == 0){
+                table = document.getElementById('handData2')
+            } else {
+                table = document.getElementById('handData1')
+            }
             let newRow = document.createElement('tr')
             newRow.setAttribute('id', 'handRow'+(i+1))
 
             let slot1 = document.createElement('td')
             slot1.setAttribute('id', 'hr'+(i+1)+'s1')
-            slot1.setAttribute('style','width:150px;border:black solid 1px;height:150px')
+            slot1.setAttribute('style','width:175px;height:175px')
             
             let slot2 = document.createElement('td')
             slot2.setAttribute('id', 'hr'+(i+1)+'s2')
-            slot2.setAttribute('style','width:150px;border:black solid 1px;height:150px')
+            slot2.setAttribute('style','width:175px;height:175px')
+
+            if (localStorage.darkmode){
+                slot1.className = 'darkTable'
+                slot2.className = 'darkTable'
+            } else {
+                slot1.className = 'lightTable'
+                slot2.className = 'lightTable'
+            }
 
             let buttonslot = document.createElement('td')
             buttonslot.setAttribute('id', 'hr'+(i+1)+'b')
+            buttonslot.setAttribute('style','width:175px;height:175px')
             //buttonslot.setAttribute('style','vertical-align:top')
 
             newRow.append(slot1)
@@ -724,7 +946,9 @@ function holdHands(rowNum, firstID, secondID){
     secondEntry.removeAttribute('onclick')
 
     document.getElementById('hr'+rowNum+'b').innerHTML = ""
-    
+    document.getElementById('select').style.display = 'none'
+    unhighlightSelectedFan()
+
     data.numFans--
     game.update()
     holding(firstID, secondID)
@@ -755,8 +979,16 @@ async function holding(id1, id2){
     if (parent1.love + parent2.love == data.maxLove*2){
         if (data.maxLove <= 95){
             data.maxLove += 5
+            let loveText = document.getElementById('maxLoveDesc')
+            loveText.innerHTML = "Maximum LOVE: "+data.maxLove
+            if (localStorage.darkmode){
+                loveText.style.animation = 'maxUpdateDark 3s'
+            } else {
+                loveText.style.animation = 'maxUpdateLight 3s'
+            }
         }
     }
+    
     if (newLove > data.maxLove){
         newLove = data.maxLove
     }
@@ -765,6 +997,13 @@ async function holding(id1, id2){
     if (parent1.loyalty + parent2.loyalty == data.maxLoyalty*2){
         if (data.maxLoyalty <= 95){
             data.maxLoyalty += 5
+            let loyaltyText = document.getElementById('maxLoyaltyDesc')
+            loyaltyText.innerHTML = "Maximum LOYALTY: "+data.maxLoyalty
+            if (localStorage.darkmode){
+                loyaltyText.style.animation = 'maxUpdateDark 3s'
+            } else {
+                loyaltyText.style.animation = 'maxUpdateLight 3s'
+            }
         }
     }
     if (newLoyalty > data.maxLoyalty){
@@ -775,6 +1014,13 @@ async function holding(id1, id2){
     if (parent1.money + parent2.money == data.maxMoney*2){
         if (data.maxMoney <= 1000){
             data.maxMoney += 10
+            let moneyText = document.getElementById('maxBudgetDesc')
+            moneyText.innerHTML = "Maximum BUDGET: $"+data.maxMoney
+            if (localStorage.darkmode){
+                moneyText.style.animation = 'maxUpdateDark 3s'
+            } else {
+                moneyText.style.animation = 'maxUpdateLight 3s'
+            }
         }
     }
     if (newMoney > data.maxMoney){
@@ -783,9 +1029,11 @@ async function holding(id1, id2){
 
 
     let newOshi = parent1.oshi.slice()
+    let newOshiIndex = parent1.oshiIndex.slice()
     for (let i=0;i<parent2.oshi.length;i++){
         if (!newOshi.includes(parent2.oshi[i])){
             newOshi.push(parent2.oshi[i])
+            newOshiIndex.push(parent2.oshiIndex[i])
         }
     }
 
@@ -812,6 +1060,7 @@ async function holding(id1, id2){
         'loyalty': newLoyalty,
         'money': newMoney,
         'oshi':newOshi,
+        'oshiIndex':newOshiIndex,
     }
 
     if (data.inProgress[index1[0]] != true || parent1.inProgress){
@@ -826,7 +1075,8 @@ async function holding(id1, id2){
 //add offspring stats to new object
 function offspring(rowNum, id1, id2){
     //console.log(rowNum)
-    let newbie = new Fan(data.offspring[rowNum-1].name, data.offspring[rowNum-1].love, data.offspring[rowNum-1].loyalty, data.offspring[rowNum-1].money, data.offspring[rowNum-1].oshi)
+    let newbie = new Fan(data.offspring[rowNum-1].name, data.offspring[rowNum-1].love, data.offspring[rowNum-1].loyalty, 
+                data.offspring[rowNum-1].money, data.offspring[rowNum-1].oshi, data.offspring[rowNum-1].oshiIndex)
         let startLength  = data.currentFans.length
         if (startLength < data.fanSlots){
             data.currentFans.push([])
@@ -877,7 +1127,7 @@ function makeBar(rowNum){
     let barSlot = document.getElementById('hr'+rowNum+'b')
     barSlot.innerHTML = ""
     let bar = document.createElement('div')
-    bar.setAttribute('style','background-color:grey;height:15px;width:100px')
+    bar.setAttribute('style','background-color:grey;height:15px;width:100px;margin:auto')
 
     let barProgress = document.createElement('div')
     barProgress.setAttribute('style','background-color:green;height:15px;width:0px')
@@ -913,7 +1163,7 @@ function updateBar(){
                 let bar = document.getElementById('barProgress'+(i+1))
                 bar.setAttribute('style','background-color:green;height:15px;width:'+data.barProgress[i]['green']+'px')
                 document.getElementById('timeLeft'+(i+1)).innerHTML = formatTime(data.barProgress[i]['duration'])
-                document.getElementById('timeLeft'+(i+1)).setAttribute('style', 'position:relative;left:25px')
+                document.getElementById('timeLeft'+(i+1)).setAttribute('style', 'position:relative;')
                 if (checkFull(data.currentFans) == data.fanSlots){
                     /*
                     if (document.getElementById('full'+(i+1)) === null){
@@ -945,7 +1195,7 @@ function upgrade(item){
                 data.funds -= data.costOfFanclub
                 data.fanSlots++
                 data.costOfFanclub *= 10
-                document.getElementById('upgradeFanclubButton').innerHTML = "Upgrade Fanclub ($"+data.costOfFanclub+")"
+                document.getElementById('upgradeFanclubButton').innerHTML = "Upgrade Fanclub\n($"+formatMoney(data.costOfFanclub)+")"
             }
             break
         case 'handSlots':
@@ -953,17 +1203,22 @@ function upgrade(item){
                 data.funds -= data.costOfChatroom
                 data.handSlots++
                 data.costOfChatroom *= 5
-                document.getElementById('upgradeChatroomButton').innerHTML = "Upgrade Chatroom ($"+data.costOfChatroom+")"
+                document.getElementById('upgradeChatroomButton').innerHTML = "Upgrade Chatroom\n($"+formatMoney(data.costOfChatroom)+")"
             }
             break
         case 'studioSlots':
+            let button = document.getElementById('upgradeStudioButton')
             if (data.funds >= data.costOfStudio && data.studioSlots < data.oshiName.length){
                 data.funds -= data.costOfStudio
                 data.studioSlots++
                 data.costOfStudio *= 10
                 data.streamSchedule.push(['-','-','-','-','-','-','-']) 
-                document.getElementById('upgradeStudioButton').innerHTML = "Upgrade Studio ($"+data.costOfStudio+")"
-            }         
+                button.innerHTML = "Upgrade Studio\n($"+formatMoney(data.costOfStudio)+")"
+            }
+            if (data.studioSlots == data.oshiName.length){
+                button.innerHTML = 'All Studios Bought!'
+                button.setAttribute('disabled', true)
+            }
             break
         default:
             console.log('upgrade error oh no')
