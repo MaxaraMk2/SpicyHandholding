@@ -344,7 +344,9 @@ function printSchedule(){
             if (data.streamSchedule[i][j] !== '-'){
                 entry.innerHTML = ""
                 let pic = document.createElement('img')
+                
                 pic.setAttribute('src', 'img/mini/mini'+data.streamSchedule[i][j]+'.png')
+
                 pic.setAttribute('style','height:50px')
                 entry.append(pic)
             } else {
@@ -398,7 +400,9 @@ function addStreamer(name){
     let newStream = document.createElement('img')
             newStream.innerHTML = name
             newStream.setAttribute('id', name)
+
             newStream.setAttribute('src', 'img/big/'+name+'.png')
+
             newStream.setAttribute('style','white-space:pre;vertical-align:top;text-align:center')
             newStream.setAttribute('onclick','assign("'+name+'")')
             newStream.setAttribute('width','100px')
